@@ -1,0 +1,27 @@
+{
+  "name": "pony-bumblebee",
+  "version": "0.1.0",
+  "description": "",
+  "private": true,
+  "scripts": {
+    "start": "browser-sync . --port 8080 --no-notify --files '*.html,app' --browser 'google chrome'",
+    "start-old": "live-server",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Martin Grödl <martin@process.studio> (https://process.studio)",
+  "license": "AGPL-3.0",
+  "engines": {
+    "node": "16.15.1",
+    "npm": "8.12.2"
+  },
+  "dependencies": {
+    "csv-parse": "^5.2.2",
+    "lil-gui": "^0.16.1",
+    "p5": "^1.4.1"
+  },
+  "devDependencies": {
+    "browser-sync": "^2.27.10",
+    "live-server": "^1.2.2"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "identifier" : "CD82AD6F-5B0C-45AB-8C77-1BCACDBA2F06",
+  "ignoredFilePatterns" : [
+    ".git"
+  ],
+  "remotePath" : "pony-bumblebee",
+  "remoteURL" : "https:\/\/sketch.process.studio\/pony-bumblebee",
+  "server" : "sketch.process.studio",
+  "usesPublishing" : true
+}
