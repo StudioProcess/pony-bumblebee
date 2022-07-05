@@ -72,10 +72,20 @@ async function setup() {
     animator = animation.make_animator([
         [ animated, 'el_s', params, 'element.s', 'sin_osc', [params.animation, 'el_s_period', 'el_s_amp', 'el_s_phase'] ],
         [ animated, 'el_r', params, 'element.r', 'sin_osc', [params.animation, 'el_r_period', 'el_r_amp', 'el_r_phase'] ],
-        [ animated, 'bee_anim_x', null, null, 'sin_osc', [params.animation, 'bee_x_period', 'bee_x_amp', 'bee_x_phase'] ],
-        [ animated, 'bee_anim_y', null, null, 'sin_osc', [params.animation, 'bee_y_period', 'bee_y_amp', 'bee_y_phase'] ],
-        [ animated, 'bee_anim_a', null, null, 'saw_osc', [params.animation, 'bee_a_period', 'bee_a_amp', 'bee_a_phase'] ],
-        [ animated, 'bee_anim_r_noise', null, null, 'perlin_osc', [params.animation, 'bee_r_noise_period', 'bee_r_noise_amp', 'bee_r_noise_scale'] ],
+        
+        [ animated, 'bee_a', null, null, 'saw_osc', [params.animation, 'bee_period', 360, 'bee_phase'] ],
+        [ animated, 'bee_r_noise', null, null, 'perlin_osc', [params.animation, 'bee_period', 'bee_noise_amp', 'bee_noise_scale', 'bee_noise_octs', 'bee_noise_adjust'] ],
+        [ animated, 'bee_a_figure', null, null, 'tri_osc', [params.animation, 'bee_period', 180, 'bee_phase'] ], // [0, 180]
+        [ animated, 'bee_r_figure', null, null, 'sin_osc', [params.animation, 'bee_period', 1] ], // [-1, 1]
+        
+        [ animated, 'bee_a_loop', null, null, 'saw_osc', [params.animation, ['bee_period', x=>x/2], 360, 'bee_phase'] ],  // [0, 360]
+        [ animated, 'bee_r_loop', null, null, 'sin_osc', [params.animation, 'bee_period', 1] ], // [-1, 1]
+        
+        // [ animated, 'bee_rx', null, null, 'sin_osc', [params.animation, 'bee_period', 'bee_x_amp', 'bee_x_phase'] ],
+        // [ animated, 'bee_ry', null, null, 'sin_osc', [params.animation, 'bee_x_period', 'bee_x_amp', 'bee_x_phase'] ],
+
+        // [ animated, 'bee_anim_y', null, null, 'sin_osc', [params.animation, 'bee_y_period', 'bee_y_amp', 'bee_y_phase'] ],
+        // [ animated, 'bee_anim_r_noise', null, null, 'perlin_osc', [params.animation, 'bee_r_noise_period', 'bee_r_noise_amp', 'bee_r_noise_scale'] ],
     ], prime_bee_position); // second arg: on_reset callback
     gui.get('animation').add(animator, 'toggle' ).name('start/stop');
     gui.get('animation').add(animator, 'reset' );
@@ -184,8 +194,32 @@ function update_bee() {
         bee.y = height/2 + params.properties.disturbance_pos_r * width/2 * sin( (params.properties.disturbance_pos_a-90) / 360 * TWO_PI );
         // add animated position
         if (params.animation.bee_anim) {
-            const sign_x = params.animation.bee_flip_x ? -1 : 1;
-            const sign_y = params.animation.bee_flip_y ? -1 : 1;
+            const sign_x = params.animation.bee_flip_dir ? -1 : 1;
+            // const sign_y = params.animation.bee_flip_y ? -1 : 1;
+            const noise = params.animation.bee_noise ? animated.bee_r_noise : 0;
+            let x, y;
+            
+            if (params.animation.bee_anim_type === 'figure-eight') {
+                x = (params.animation.bee_rx * animated.bee_r_figure + noise) * cos( radians(animated.bee_a_figure-90) );
+                y = (params.animation.bee_ry * animated.bee_r_figure + noise) * sin( radians(animated.bee_a_figure-90) );
+            } else if (params.animation.bee_anim_type === 'double-loop') {
+                x = (params.animation.bee_rx * animated.bee_r_loop + noise) * cos( radians(animated.bee_a_loop-90) );
+                y = (params.animation.bee_ry * animated.bee_r_loop + noise) * sin( radians(animated.bee_a_loop-90) );
+            } else { // ellipse
+                x = (params.animation.bee_rx + noise) * cos( radians(animated.bee_a-90) );
+                y = (params.animation.bee_ry + noise) * sin( radians(animated.bee_a-90) );
+            }
+            
+            // add rotation
+            const a = radians(params.animation.bee_rotation);
+            let anim_x = x * cos(a) - y * sin(a);
+            let anim_y = x * sin(a) + y * cos(a);
+            
+            
+            bee.x = bee.x + sign_x * anim_x;
+            bee.y = bee.y + anim_y;
+            
+            /*
             if (params.animation.bee_anim_type === 'polar_perlin') {
                 // const anim_x = animated.bee_anim_r * cos( (animated.bee_anim_a-90) / 360 * TWO_PI );
                 // const anim_y = animated.bee_anim_r * sin( (animated.bee_anim_a-90) / 360 * TWO_PI );
@@ -198,6 +232,7 @@ function update_bee() {
                 bee.x += sign_x * animated.bee_anim_x;
                 bee.y += sign_y * animated.bee_anim_y;
             }
+            */
         }
     }
     // console.log('update %d / %f', bee.x, params.properties.disturbance_pos_a);

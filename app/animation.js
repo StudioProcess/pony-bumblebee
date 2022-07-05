@@ -45,11 +45,12 @@ export function square_osc(step, period = 30, amp = 1, phase = 0) {
 
 // [0, amp] with noise_adjust = 0
 // [-amp, amp] with noise_adjust = -0.5 or -0.25
-export function perlin_osc(step, period = 30, amp = 1, noise_scale = 1, noise_seed = 0, noise_adjust = -0.5) {
+export function perlin_osc(step, period = 30, amp = 1, noise_scale = 1, noise_octs = 1, noise_adjust = -0.5, noise_seed = 0) {
     // make a circle in noisespace -> produces seamless looping noise
     const r = noise_scale;
     const x = r * Math.cos( step / period * TWO_PI ) + r; // shift to first quadrant, because noise seems to be symmetric around 0
     const y = r * Math.sin( step / period * TWO_PI ) + r;
+    noiseDetail(noise_octs);
     noiseSeed(noise_seed);
     if (noise_adjust !== 0) {
         return amp * (noise(x, y) + noise_adjust) * (-1/noise_adjust);
@@ -145,6 +146,14 @@ export function make_animator(props, on_reset = undefined) {
             const param_obj = anim_params[0];
             const param_props = anim_params.slice(1);
             const param_values = param_props.map( prop_name => {
+                if (Array.isArray(prop_name)) { // ['prop_name', x => x * 0.5] // with mapping function
+                    let val = deep_get(param_obj, prop_name[0]); // first element is the property name
+                    if (typeof prop_name[1] === 'function') { val = prop_name[1](val); } // second element is a mapping function
+                    return val;
+                }
+                if (typeof prop_name !== 'string') { // constant value 
+                    return prop_name; // return the given property itself, it's a constant value
+                }
                 const val = deep_get(param_obj, prop_name);
                 // console.log(prop_name, val);
                 return val;
