@@ -75,11 +75,17 @@ async function setup() {
         
         [ animated, 'bee_a', null, null, 'saw_osc', [params.animation, 'bee_period', 360, 'bee_phase'] ],
         [ animated, 'bee_r_noise', null, null, 'perlin_osc', [params.animation, 'bee_period', 'bee_noise_amp', 'bee_noise_scale', 'bee_noise_octs', 'bee_noise_adjust'] ],
+        
         [ animated, 'bee_a_figure', null, null, 'tri_osc', [params.animation, 'bee_period', 180, 'bee_phase'] ], // [0, 180]
         [ animated, 'bee_r_figure', null, null, 'sin_osc', [params.animation, 'bee_period', 1] ], // [-1, 1]
         
-        [ animated, 'bee_a_loop', null, null, 'saw_osc', [params.animation, ['bee_period', x=>x/2], 360, 'bee_phase'] ],  // [0, 360]
-        [ animated, 'bee_r_loop', null, null, 'sin_osc', [params.animation, 'bee_period', 1] ], // [-1, 1]
+        [ animated, 'bee_a_loop2', null, null, 'saw_osc', [params.animation, ['bee_period', x=>x/2], 360, 'bee_phase'] ],  // [0, 360]
+        [ animated, 'bee_r_loop2', null, null, 'sin_osc', [params.animation, 'bee_period', 1] ], // [-1, 1]
+        
+        [ animated, 'bee_a_loop', null, null, 'saw_osc', [params.animation, ['bee_period', x=>x/3*2], 360, 'bee_phase'] ],  // [0, 360]
+        [ animated, 'bee_r_loop', null, null, 'sin_osc', [params.animation, ['bee_period', x=>x*2], 1] ], // [-1, 1]
+        [ animated, 'bee_a_loop', null, null, 'saw_osc', [params.animation, ['bee_period', x=>x/3*2], 360, 'bee_phase'] ],  // [0, 360]
+        [ animated, 'bee_noise_sign_loop', null, null, 'square_osc', [params.animation, ['bee_period', x=>x*2]] ], // [0, 1]
         
         // [ animated, 'bee_rx', null, null, 'sin_osc', [params.animation, 'bee_period', 'bee_x_amp', 'bee_x_phase'] ],
         // [ animated, 'bee_ry', null, null, 'sin_osc', [params.animation, 'bee_x_period', 'bee_x_amp', 'bee_x_phase'] ],
@@ -194,20 +200,32 @@ function update_bee() {
         bee.y = height/2 + params.properties.disturbance_pos_r * width/2 * sin( (params.properties.disturbance_pos_a-90) / 360 * TWO_PI );
         // add animated position
         if (params.animation.bee_anim) {
-            const sign_x = params.animation.bee_flip_dir ? -1 : 1;
+            const sign = params.animation.bee_flip_dir ? -1 : 1;
             // const sign_y = params.animation.bee_flip_y ? -1 : 1;
             const noise = params.animation.bee_noise ? animated.bee_r_noise : 0;
             let x, y;
             
             if (params.animation.bee_anim_type === 'figure-eight') {
-                x = (params.animation.bee_rx * animated.bee_r_figure + noise) * cos( radians(animated.bee_a_figure-90) );
-                y = (params.animation.bee_ry * animated.bee_r_figure + noise) * sin( radians(animated.bee_a_figure-90) );
+                x = (params.animation.bee_rx * animated.bee_r_figure + noise) * cos( sign * radians(animated.bee_a_figure-90) );
+                y = (params.animation.bee_ry * animated.bee_r_figure + noise) * sin( sign * radians(animated.bee_a_figure-90) );
             } else if (params.animation.bee_anim_type === 'double-loop') {
-                x = (params.animation.bee_rx * animated.bee_r_loop + noise) * cos( radians(animated.bee_a_loop-90) );
-                y = (params.animation.bee_ry * animated.bee_r_loop + noise) * sin( radians(animated.bee_a_loop-90) );
+                x = (params.animation.bee_rx * animated.bee_r_loop2 + noise) * cos( sign * radians(animated.bee_a_loop2) );
+                y = (params.animation.bee_ry * animated.bee_r_loop2 + noise) * sin( sign * radians(animated.bee_a_loop2) );
+            } else if (params.animation.bee_anim_type === 'loop') {
+                // fix discontinuity around 0 degrees, when using noise
+                const fix_angle = 30; // scale down noise around 0 degrees +/- fix_angle
+                let angle = (animated.bee_a - params.animation.bee_phase) % 360; // [0, 360] // Note: use global bee angle, since loop bee angle has weird period; also respect phase
+                if (angle > 180) { angle -= 360; } // [-180, 180]
+                const noise_factor = min( abs(angle), fix_angle) / fix_angle;
+                // let a = (animated.bee_a - params.animation.bee_phase);
+                console.log(noise_factor);
+                
+                const noise_sign = animated.bee_noise_sign_loop * 2 - 1;
+                x = (params.animation.bee_rx * animated.bee_r_loop + noise_sign * noise * noise_factor) * cos( sign * radians(animated.bee_a_loop) );
+                y = (params.animation.bee_ry * animated.bee_r_loop + noise_sign * noise * noise_factor) * sin( sign * radians(animated.bee_a_loop) );
             } else { // ellipse
-                x = (params.animation.bee_rx + noise) * cos( radians(animated.bee_a-90) );
-                y = (params.animation.bee_ry + noise) * sin( radians(animated.bee_a-90) );
+                x = (params.animation.bee_rx + noise) * cos( sign * radians(animated.bee_a-90) );
+                y = (params.animation.bee_ry + noise) * sin( sign * radians(animated.bee_a-90) );
             }
             
             // add rotation
@@ -216,7 +234,7 @@ function update_bee() {
             let anim_y = x * sin(a) + y * cos(a);
             
             
-            bee.x = bee.x + sign_x * anim_x;
+            bee.x = bee.x + anim_x;
             bee.y = bee.y + anim_y;
             
             /*
