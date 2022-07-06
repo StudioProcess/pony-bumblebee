@@ -767,6 +767,13 @@ async function render() {
         await renderer.render_list(list, params.render.limit, anim_frames);
     }
     gui.lock(false);
+    if (config.noloop_after_render) {
+        noLoop();
+        setTimeout(() => {
+            alert('Rendering finished. Sleeping...');
+            loop();
+        })
+    }
 }
 
 

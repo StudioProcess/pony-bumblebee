@@ -25,6 +25,7 @@ const config = {
         frames: 'frames',
         metadata: 'metadata',
     },
+    noloop_after_render: true,
 };
 
 const soil_data = [
