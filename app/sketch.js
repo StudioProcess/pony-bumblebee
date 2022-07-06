@@ -763,7 +763,8 @@ async function render() {
 document.addEventListener('keydown', e => {
     // console.log(e.key, e.keyCode, e);
     
-    if (e.key == 'r') {
+    // SHIFT-R
+    if (e.key == 'R' && !e.ctrlKey && !e.metaKey ) {
         render();
     }
     
