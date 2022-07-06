@@ -216,12 +216,22 @@ function update_bee() {
             const noise = params.animation.bee_noise ? animated.bee_r_noise : 0;
             let x, y;
             
-            if (params.animation.bee_anim_type === 'figure-eight') {
-                x = (params.animation.bee_rx * animated.bee_r_figure + noise) * cos( sign * radians(animated.bee_a_figure-90) );
-                y = (params.animation.bee_ry * animated.bee_r_figure + noise) * sin( sign * radians(animated.bee_a_figure-90) );
+            const rx = params.animation.bee_rx;
+            // set ry, so sum of rx and ry is [rmax, rmin]
+            const ry = params.animation.bee_limit_r ? constrain(
+                params.animation.bee_ry,
+                max(params.animation.bee_rmin-params.animation.bee_rx, 0), 
+                params.animation.bee_rmax-params.animation.bee_rx, 
+            ) : params.animation.bee_ry;
+            gui.get('info', 'bee_rx').setValue(rx);
+            gui.get('info', 'bee_ry').setValue(ry);
+            
+            if (params.animation.bee_anim_type === 'eight') {
+                x = (rx * animated.bee_r_figure + noise) * cos( sign * radians(animated.bee_a_figure-90) );
+                y = (ry * animated.bee_r_figure + noise) * sin( sign * radians(animated.bee_a_figure-90) );
             } else if (params.animation.bee_anim_type === 'double-loop') {
-                x = (params.animation.bee_rx * animated.bee_r_loop2 + noise) * cos( sign * radians(animated.bee_a_loop2) );
-                y = (params.animation.bee_ry * animated.bee_r_loop2 + noise) * sin( sign * radians(animated.bee_a_loop2) );
+                x = (rx * animated.bee_r_loop2 + noise) * cos( sign * radians(animated.bee_a_loop2) );
+                y = (ry * animated.bee_r_loop2 + noise) * sin( sign * radians(animated.bee_a_loop2) );
             } else if (params.animation.bee_anim_type === 'loop') {
                 // fix discontinuity around 0 degrees, when using noise
                 const fix_angle = 30; // scale down noise around 0 degrees +/- fix_angle
@@ -229,8 +239,8 @@ function update_bee() {
                 if (angle > 180) { angle -= 360; } // [-180, 180]
                 const noise_factor = min( abs(angle), fix_angle) / fix_angle;
                 const noise_sign = animated.bee_noise_sign_loop * 2 - 1;
-                x = (params.animation.bee_rx * animated.bee_r_loop + noise_sign * noise * noise_factor) * cos( sign * radians(animated.bee_a_loop) );
-                y = (params.animation.bee_ry * animated.bee_r_loop + noise_sign * noise * noise_factor) * sin( sign * radians(animated.bee_a_loop) );
+                x = (rx * animated.bee_r_loop + noise_sign * noise * noise_factor) * cos( sign * radians(animated.bee_a_loop) );
+                y = (ry * animated.bee_r_loop + noise_sign * noise * noise_factor) * sin( sign * radians(animated.bee_a_loop) );
             } else if (params.animation.bee_anim_type === 'tri') {
                 // fix discontinuity around 0 degrees, when using noise
                 const fix_angle = 30; // scale down noise around 0 degrees +/- fix_angle
@@ -238,11 +248,11 @@ function update_bee() {
                 if (angle > 180) { angle -= 360; } // [-180, 180]
                 const noise_factor = min( abs(angle), fix_angle) / fix_angle;
                 const noise_sign = animated.bee_noise_sign_tri * 2 - 1;
-                x = (params.animation.bee_rx * animated.bee_r_tri + noise_sign * noise * noise_factor) * cos( sign * radians(animated.bee_a_tri) );
-                y = (params.animation.bee_ry * animated.bee_r_tri + noise_sign * noise * noise_factor) * sin( sign * radians(animated.bee_a_tri) );
+                x = (rx * animated.bee_r_tri + noise_sign * noise * noise_factor) * cos( sign * radians(animated.bee_a_tri) );
+                y = (ry * animated.bee_r_tri + noise_sign * noise * noise_factor) * sin( sign * radians(animated.bee_a_tri) );
             } else { // ellipse
-                x = (params.animation.bee_rx + noise) * cos( sign * radians(animated.bee_a-90) );
-                y = (params.animation.bee_ry + noise) * sin( sign * radians(animated.bee_a-90) );
+                x = (rx + noise) * cos( sign * radians(animated.bee_a-90) );
+                y = (ry + noise) * sin( sign * radians(animated.bee_a-90) );
             }
             
             // add rotation
@@ -764,11 +774,15 @@ document.addEventListener('keydown', e => {
     // console.log(e.key, e.keyCode, e);
     
     // SHIFT-R
-    if (e.key == 'R' && !e.ctrlKey && !e.metaKey ) {
+    if (e.key === 'R' && !e.ctrlKey && !e.metaKey ) {
+        console.log('RENDER KEY pRESSED');
         render();
     }
     
-    if (renderer.running) { return; }
+    if (renderer.running) { 
+        console.log('RUNNING return');
+        return; 
+    }
     
     // following commands disabled during rendering
    
