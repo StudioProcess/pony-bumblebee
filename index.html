@@ -34,8 +34,34 @@
     
 <body>
     <main></main>
-    <script src="./node_modules/p5/lib/p5.min.js"></script>
-    <script type="module" src="./app/sketch.js"></script>
+    
+    <!-- <script src="./node_modules/p5/lib/p5.min.js"></script> -->
+    <!-- <script id="sketch" type="module" src="./app/sketch.js"></script> -->
+    
+    <script type="module">
+        // Note: this is quite awful
+        // cache-busting: load main sketch file with query parameter taken from git-hash file or timestamp
+        let [res1, res2] = await Promise.all([ fetch('./git-hash'), fetch('./package.json') ]);
+        const hash = res1.status === 200 ? (await res1.text()).trim() : Date.now();
+        const package_json = await res2.json();
+        // console.log(hash, version);
+        
+        const script = document.createElement('script');
+        script.src = './app/sketch.js?' + hash;
+        script.type = 'module';
+        script.id = 'sketch';
+        script.dataset.hash = hash;
+        script.dataset.version = package_json.version;
+        script.dataset.name = package_json.name;
+        script.addEventListener('load', () => {
+            // need to wait before loading p5
+            const p5script = document.createElement('script');
+            p5script.src = './node_modules/p5/lib/p5.min.js';
+            document.body.appendChild(p5script);
+        });
+        document.head.appendChild(script);
+    </script>
+
 </body>
 
 </html>

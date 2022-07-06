@@ -27,6 +27,7 @@ let d_weather, current_weather; // weather data
 let propman; // property manager
 let animator, animated = {};
 
+console.log('loading module');
 
 // rendering properties of the elements to be drawn
 // contains visible elements only
@@ -39,6 +40,7 @@ const el = {
 };
 
 async function setup() {
+    console.log('running');
     // for (let x=0; x<30; x++) {
     //     let y = animation.perlin_osc(x, 5, 1, 1);
     //     console.log(y);
@@ -52,6 +54,7 @@ async function setup() {
     
     // gui
     gui = new lil.GUI;
+    gui.title(title_string());
     gui.addAll(params);
     gui.get('global')?.close();
     gui.get('color').close();
@@ -134,6 +137,11 @@ async function setup() {
     
     // renderer
     renderer.init(propman, animator);
+}
+
+function title_string() {
+    const sketch = document.querySelector('#sketch');
+    return `${sketch.dataset.name} v${sketch.dataset.version} (${sketch.dataset.hash})`;
 }
 
 function on_prop_set_select(propman) {

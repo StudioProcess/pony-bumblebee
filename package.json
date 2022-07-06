@@ -4,9 +4,12 @@
   "description": "",
   "private": true,
   "scripts": {
-    "start": "browser-sync . --port 8080 --no-notify --files '*.html,app' --browser 'google chrome'",
+    "start": "browser-sync . --port 8080 --no-notify --files '*.html,app,.git-hash' --browser 'google chrome'",
     "start-old": "live-server",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "update-version": "git rev-parse HEAD | cut -c 1-7 > git-hash",
+    "preinstall": "npm run update-version",
+    "prestart": "npm run update-version"
   },
   "keywords": [],
   "author": "Martin Grödl <martin@process.studio> (https://process.studio)",
