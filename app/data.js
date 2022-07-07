@@ -351,6 +351,10 @@ export function edna_subtrees_sorted(root, sort_by, order = 'descending', min_va
     if (limit > 0) {
         sub = sub.slice(0, limit);
     }
+    // add idx_sorted
+    for (let [i, node] of sub.entries()) {
+        node.idx_sorted = i;
+    }
     return sub;
 }
 
