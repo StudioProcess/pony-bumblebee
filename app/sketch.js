@@ -16,13 +16,8 @@ import properties from './properties.js';
 import * as animation from './animation.js';
 
 let gui;
-
 let img_bee, bee;
-// let bee_px, bee_py, bee_dirx = -1, bee_accx = 0, bee_r = 0, bee_x, bee_y;
-// const bee = { x:null, y:null, px:null, py:null, dirx:-1, accx:0, r:0 };
-
 let d_edna, current_root; // current edna subtree root
-
 let d_weather, current_weather; // weather data
 let propman; // property manager
 let animator, animated = {};
@@ -40,11 +35,6 @@ const el = {
 };
 
 async function setup() {
-    console.log('running');
-    // for (let x=0; x<30; x++) {
-    //     let y = animation.perlin_osc(x, 5, 1, 1);
-    //     console.log(y);
-    // }
     // noLoop();
     // return;
     
@@ -92,12 +82,6 @@ async function setup() {
         [ animated, 'bee_a_tri', null, null, 'saw_osc', [params.animation, ['bee_period', x=>x*2], 360, 'bee_phase'] ],  // [0, 360]
         [ animated, 'bee_r_tri', null, null, 'sin_osc', [params.animation, ['bee_period', x=>x/3*2], 1] ], // [-1, 1]
         [ animated, 'bee_noise_sign_tri', null, null, 'square_osc', [params.animation, ['bee_period', x=>x*2]] ], // [0, 1]
-        
-        // [ animated, 'bee_rx', null, null, 'sin_osc', [params.animation, 'bee_period', 'bee_x_amp', 'bee_x_phase'] ],
-        // [ animated, 'bee_ry', null, null, 'sin_osc', [params.animation, 'bee_x_period', 'bee_x_amp', 'bee_x_phase'] ],
-
-        // [ animated, 'bee_anim_y', null, null, 'sin_osc', [params.animation, 'bee_y_period', 'bee_y_amp', 'bee_y_phase'] ],
-        // [ animated, 'bee_anim_r_noise', null, null, 'perlin_osc', [params.animation, 'bee_r_noise_period', 'bee_r_noise_amp', 'bee_r_noise_scale'] ],
     ], prime_bee_position); // second arg: on_reset callback
     gui.get('animation').add(animator, 'toggle' ).name('start/stop');
     gui.get('animation').add(animator, 'reset' );
@@ -261,24 +245,8 @@ function update_bee() {
             let anim_x = x * cos(a) - y * sin(a);
             let anim_y = x * sin(a) + y * cos(a);
             
-            
             bee.x = bee.x + anim_x;
             bee.y = bee.y + anim_y;
-            
-            /*
-            if (params.animation.bee_anim_type === 'polar_perlin') {
-                // const anim_x = animated.bee_anim_r * cos( (animated.bee_anim_a-90) / 360 * TWO_PI );
-                // const anim_y = animated.bee_anim_r * sin( (animated.bee_anim_a-90) / 360 * TWO_PI );
-                // const ratio = params.animation.bee_ry !== 0 ? params.animation.bee_rx / params.animation.bee_ry : 1;
-                const anim_x = (params.animation.bee_rx + animated.bee_anim_r_noise) * cos( (animated.bee_anim_a-90) / 360 * TWO_PI );
-                const anim_y = (params.animation.bee_ry + animated.bee_anim_r_noise) * sin( (animated.bee_anim_a-90) / 360 * TWO_PI );
-                bee.x += sign_x * anim_x;
-                bee.y += sign_y * anim_y;
-            } else { // cartesian
-                bee.x += sign_x * animated.bee_anim_x;
-                bee.y += sign_y * animated.bee_anim_y;
-            }
-            */
         }
     }
     // console.log('update %d / %f', bee.x, params.properties.disturbance_pos_a);
@@ -362,43 +330,9 @@ function draw_trail() {
         pop();
     }
 }
+
 function clear_trail() {
     bee.trail = [];
-}
-
-let bee_px, bee_py, bee_dirx = -1, bee_accx = 0, bee_r = 0, bee_x, bee_y;
-function draw_bee_old(x, y) {
-    // x direction flipping
-    let dx = x - bee_px; // delta x, since last frame (>0 rightwards movement, <0 leftwards movement)
-    if (dx) bee_accx += dx;
-    // console.log(bee_accx);
-    if (abs(bee_accx) > 10) {
-        if (Math.sign(bee_accx) !== Math.sign(bee_dirx)) bee_dirx = -bee_dirx;
-        bee_accx = 0;
-    }
-    
-    // rotation based on heading direction
-    let a = atan2(y-bee_py, x-bee_px) / TWO_PI * 360;
-    // treat angles so we get deviation from horizontal axis (pos: tilt down, neg: tilt up)
-    if (a > 90) { a = 180 - a; } 
-    else if (a < -90) { a = -180 - a; }
-    if (a) bee_r = constrain( (bee_r*0.9 + a*0.1), -20, 20 );
-    
-    push();
-    translate(x, y);
-    rotate(bee_r/360*TWO_PI * Math.sign(bee_dirx));
-    if (bee_dirx > 0) scale(-1, 1);
-    // if (params.bee.bg) {
-    //     fill(params.color.bg);
-    //     noStroke();
-    //     ellipse(0, 0, params.bee.size * 1.42, params.bee.size * 1.42);
-    // }
-    // noTint();
-    image(img_bee, -params.bee.size/2, -params.bee.size/2, params.bee.size, params.bee.size);
-    pop();
-    
-    bee_px = x;
-    bee_py = y;
 }
 
 
@@ -773,7 +707,7 @@ async function render() {
         setTimeout(() => {
             alert('Rendering finished. Sleeping...');
             loop();
-        })
+        });
     }
 }
 
@@ -783,12 +717,10 @@ document.addEventListener('keydown', e => {
     
     // SHIFT-R
     if (e.key === 'R' && !e.ctrlKey && !e.metaKey ) {
-        console.log('RENDER KEY pRESSED');
         render();
     }
     
     if (renderer.running) { 
-        console.log('RUNNING return');
         return; 
     }
     
