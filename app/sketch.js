@@ -339,10 +339,10 @@ function clear_trail() {
 function draw_indicator(x, y) {
     push();
     noStroke();
-    fill(params.color.bg);
-    ellipse(x, y, params.bee.size * 0.5, params.bee.size * 0.5)
+    fill(params.color.fill);
+    ellipse(x, y, params.bee.size * 0.4, params.bee.size * 0.4)
     fill(params.color.fillbw);
-    ellipse(x, y, params.bee.size * 0.5 * 0.9, params.bee.size * 0.5 * 0.9)
+    ellipse(x, y, params.bee.size * 0.4 * 0.9, params.bee.size * 0.4 * 0.9)
     pop();
 }
 
@@ -738,8 +738,16 @@ document.addEventListener('keydown', e => {
         gui.show(gui._hidden);
     }
     
-    else if (e.key == 't') { // h .. toggle gui
+    else if (e.key == 't') { // t .. toggle bee's trail
         gui.get('bee', 'trail').setValue(!params.bee.trail);
+    }
+    
+    else if (e.key == 'b') { // b .. toggle bee
+        gui.get('properties', 'bee_visible').setValue(!params.properties.bee_visible);
+    }
+    
+    else if (e.key == 'i') { // i .. toggle indicator
+        gui.get('bee', 'indicator').setValue(!params.bee.indicator);
     }
     
     else if (e.key === 'ArrowUp') {
