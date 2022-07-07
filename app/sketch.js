@@ -538,7 +538,7 @@ function make_colors(num, seed = 0) {
 function make_forms(num, seed = 0) {
     const forms = ['pony_quad', 'ellipse'];
     let out = [];
-    const n = int(num * params.properties.form);
+    const n = int(num * params.properties.round);
     for (let i=0; i < num; i++) {
         if (i < n) { 
           out.push(forms[1]);
@@ -549,6 +549,11 @@ function make_forms(num, seed = 0) {
     if (seed !== 0) {
         randomSeed(seed);
         out = util.shuffle(out);
+    }
+    if (num > 0 && params.properties.root_round_chance > 0) {
+        if (random() < params.properties.root_round_chance) { 
+            out[0] = forms[1];
+        }
     }
     return out;
 }
