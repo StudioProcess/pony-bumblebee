@@ -179,9 +179,9 @@ const params = {
     },
     render: {
         scope: [ 'seq_list', ['current_set', 'all_sets', 'seq_range', 'seq_list']],
-        limit: [100, 0, undefined],
+        limit: [0, 0, undefined],
         seq_range_from: [1, 1, undefined],
-        seq_range_to: [10, 1, undefined],
+        seq_range_to: [8760, 1, undefined],
         seq_list: '20, 30, 40',
         animation: true,
         animation_frames: 300,

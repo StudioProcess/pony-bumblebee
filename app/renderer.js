@@ -147,10 +147,9 @@ export async function render_all_sets(limit = 0, anim_frames = 0) {
     let list = [];
     // { 'kat.1': {from_seq: 1, to_seq: 88, count: 88}, ... }
     for (let { from_seq, count } of Object.values(propman.set_seq_nos)) {
-        const stop = from_seq + Math.min(count, limit); // limit counts for EACH set
+        const stop = limit > 0 ? from_seq + Math.min(count, limit) : from_seq + count; // limit counts for EACH set
         list = list.concat( util.range(from_seq, stop) );
     };
-    // console.log(list);
     return render_list( list, 0, anim_frames ); // call this with limit 0, each set is already limited
 }
 
