@@ -119,6 +119,7 @@ async function setup() {
         });
         d_edna.push(result);
         console.log(result);
+        // console.log(result.csv);
     }
     
     // weather data
@@ -803,6 +804,10 @@ document.addEventListener('keydown', e => {
     
     else if (e.key == 'h') { // h .. toggle gui
         gui.show(gui._hidden);
+    }
+    
+    else if (e.key == 't') { // h .. toggle gui
+        gui.get('bee', 'trail').setValue(!params.bee.trail);
     }
     
     else if (e.key === 'ArrowUp') {
