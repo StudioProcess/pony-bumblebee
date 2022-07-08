@@ -137,7 +137,7 @@ export function start(_options) {
   }
   
   tape = new Tarball();
-  fps_counter = new FPSCounter(15); // measure over 15 secs
+  fps_counter = new FPSCounter(5); // measure over 5 secs
   timer = new Timer();
   
   createHUD();
