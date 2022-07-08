@@ -631,7 +631,7 @@ function draw() {
     gui.get('_nft_metadata', 'Geolocation (Lat, Lon)').setValue(config.edna_samples_info[sample_idx].geolocation);
     gui.get('_nft_metadata', 'Timestamp').setValue(current_weather.dt_iso);
     gui.get('_nft_metadata', 'Temperature (°C)').setValue(current_weather.temp);
-    gui.get('_nft_metadata', 'Wind Direction').setValue(current_weather.wind_deg);
+    gui.get('_nft_metadata', 'Wind Direction (°)').setValue(current_weather.wind_deg);
     const soil = soil_data[sample_idx];
     for ( let key of Object.keys(soil).filter( k => !k.startsWith('_') )) {
         gui.get('_nft_metadata', key).setValue(soil[key]);
@@ -643,6 +643,10 @@ function draw() {
         // noLoop();
         gui.get('_nft_metadata', '_edna_target', key).setValue(val);
     }
+    gui.get('_nft_metadata', '_weather_extra', 'Atmospheric Pressure (hPa)').setValue(current_weather.pressure);
+    gui.get('_nft_metadata', '_weather_extra', 'Humidity (%)').setValue(current_weather.humidity);
+    gui.get('_nft_metadata', '_weather_extra', 'Wind Speed (m/s)').setValue(current_weather.wind_speed);
+    gui.get('_nft_metadata', '_weather_extra', 'Rain (mm/h)').setValue(current_weather.rain_1h);
     
     // determine element rendering properties
     el.idx = 0;
