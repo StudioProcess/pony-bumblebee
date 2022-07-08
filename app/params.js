@@ -38,10 +38,21 @@ const soil_data = [
     },
 ];
 
+// row.kingdom, row.phylum, row.class, row.order, row.family, row.genus, row.species
+
 const params = {
     _nft_metadata: {
         _category_name: '',
         _category_no: -1,
+        _edna_target: {
+            '1_kingdom': '',
+            '2_phylum': '',
+            '3_class': '',
+            '4_order': '',
+            '5_family': '',
+            '6_genus': '',
+            '7_species': '',
+        },
         'No.': -1,
         // 'Category': '',
         'eDNA Target': '',

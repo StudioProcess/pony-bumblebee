@@ -4,6 +4,8 @@
 
 import * as util from './util.js';
 
+const LAYER_NAMES = ['kingdom', 'phylum', 'class', 'order', 'family',  'genus', 'species'];
+
 
 // symmetric log transform
 // https://en.wikipedia.org/wiki/Logarithmic_scale#Extensions
@@ -174,8 +176,7 @@ function make_node(depth, key) {
 //   get_layer(max_depth): get layer of a certain depth
 export function make_edna_tree(data) {
     // key names to the layers from the top down
-    const layer_names = ['kingdom', 'phylum', 'class', 'order', 'family',  'genus', 'species'];
-    const max_depth = layer_names.length;
+    const max_depth = LAYER_NAMES.length;
     
     // layer data structure
     // keeps map of key to node for each layer/depth of the tree
@@ -192,7 +193,7 @@ export function make_edna_tree(data) {
     function key_path(line, depth) {
         function key_path(line, depth) { // constructs an array
             if (depth === 0) { return [] };
-            const layer_name = layer_names[depth-1];
+            const layer_name = LAYER_NAMES[depth-1];
             const key = line[layer_name];
             return key_path(line, depth-1).concat([key]);
         }
@@ -201,7 +202,7 @@ export function make_edna_tree(data) {
     
     function process_line(line, depth, child_node = null) {
         // console.log(depth, line);
-        const layer_name = layer_names[depth-1];
+        const layer_name = LAYER_NAMES[depth-1];
         const key = depth > 0 ? line[layer_name] : 'root';
         /*
         
@@ -421,6 +422,20 @@ export async function load_process_edna(url, sample = 'Test', options = {}) {
     
     // output node data
     obj.csv = util.objects_to_csv(obj.edna_sorted, ['node']);
+    return obj;
+}
+
+export function edna_path_to_obj(path) {
+    const key_names = LAYER_NAMES.map( (x, i) => (i+1) + '_' + x );
+    const obj = Object.fromEntries( key_names.map(x => [x, '*']) );
+    path = path.trim();
+    if (path.startsWith('/')) { path = path.slice(1); }
+    let parts = path.split('/');
+    for (let [i, part] of parts.entries()) {
+        if (part !== '') {
+            obj[ key_names[i] ] = part;
+        }
+    }
     return obj;
 }
 

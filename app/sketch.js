@@ -45,7 +45,6 @@ async function setup() {
     gui.title(title_string());
     gui.addAll(params);
     gui.get('_nft_metadata').close();
-    gui.get('global')?.close();
     gui.get('general').close();
     gui.get('color').close();
     gui.get('animation').close();
@@ -636,6 +635,13 @@ function draw() {
     const soil = soil_data[sample_idx];
     for ( let key of Object.keys(soil).filter( k => !k.startsWith('_') )) {
         gui.get('_nft_metadata', key).setValue(soil[key]);
+    }
+    const edna_path_obj = data.edna_path_to_obj(edna_path);
+    for ( let [key, val] of Object.entries(edna_path_obj) ) {
+        // let controller = gui.get('_nft_metadata', '_edna_target', key)
+        // console.log(controller);
+        // noLoop();
+        gui.get('_nft_metadata', '_edna_target', key).setValue(val);
     }
     
     // determine element rendering properties
