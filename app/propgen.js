@@ -284,6 +284,7 @@ export function make_prop_set_manager(properties, params, on_select = undefined,
         let name = name_or_idx;
         let idx = name_or_idx;
         if (typeof name_or_idx === 'number') {
+            name_or_idx = Math.max( Math.min(name_or_idx, obj.set_count-1), 0 ); // limit to valid indices
             name = Object.keys(properties)[name_or_idx];
         }
         if (typeof name_or_idx === 'string') {

@@ -7,8 +7,8 @@ const config = {
     edna_data_file: './data/2022-06-15 IA-2022-04 Complete.csv',
     edna_samples: ['IA-2022-04_01', 'IA-2022-04_02'],
     edna_samples_info: [
-        { name: 'PONY Field', geolocation: '48.93035, 15.26854' },
-        { name: 'PONY Garden', geolocation: '48.93031, 15.26797' },
+        { name: 'PONY Field 0001', geolocation: '48.93035, 15.26854' },
+        { name: 'PONY Garden 0001', geolocation: '48.93031, 15.26797' },
     ],
     // edna_min_sequences: 25,
     edna_top_sequences: 400,
@@ -29,15 +29,20 @@ const config = {
 };
 
 const soil_data = [
-    { _sample: 'PONY Field', 'Humus (Organic Matter)': 3.4, 'Calcium (Ca)': 1605, 'Magnesium (Mg)': 235, 'Potassium (K)': 570, 'Phosphor (P)': 20, 'Nitrogen (N)': 13.5, 'Sulfate (SO4)': 22.6, 'Iron (Fe)': 1.8, 'Manganese (Mn)': 0.32, 'Copper (Cu)': 0.14, 'Zinc (Zn)': 0.02, 'Molybdenum (Mo)': 0, 'Boron (B)': 0.1, 'Silicon (Si)': 20.5, 'Cobalt (Co)': 0.003 },
-    { _sample: 'PONY Garden', 'Humus (Organic Matter)': 3.8, 'Calcium (Ca)': 1755, 'Magnesium (Mg)': 210, 'Potassium (K)': 600, 'Phosphor (P)': 20, 'Nitrogen (N)': 9.5, 'Sulfate (SO4)': 18.6, 'Iron (Fe)': 4.4, 'Manganese (Mn)': 2.07, 'Copper (Cu)': 0.14, 'Zinc (Zn)': 0.03, 'Molybdenum (Mo)': 0, 'Boron (B)': 0.14, 'Silicon (Si)': 19.3, 'Cobalt (Co)': 0.004 },
+    { _sample: 'PONY Field', 'Humus (Organic Matter)': 3.4, 'Calcium (Ca)': 1605, 'Magnesium (Mg)': 235, 'Potassium (K)': 570, 'Phosphor (P)': 20, 'Nitrogen (N)': 13.5, 'Sulfate (SO4)': 22.6, 'Iron (Fe)': 1.8,
+    // 'Manganese (Mn)': 0.32, 'Copper (Cu)': 0.14, 'Zinc (Zn)': 0.02, 'Molybdenum (Mo)': 0, 'Boron (B)': 0.1, 'Silicon (Si)': 20.5, 'Cobalt (Co)': 0.003 
+    },
+    { _sample: 'PONY Garden', 'Humus (Organic Matter)': 3.8, 'Calcium (Ca)': 1755, 'Magnesium (Mg)': 210, 'Potassium (K)': 600, 'Phosphor (P)': 20, 'Nitrogen (N)': 9.5, 'Sulfate (SO4)': 18.6, 'Iron (Fe)': 4.4,
+    //'Manganese (Mn)': 2.07, 'Copper (Cu)': 0.14, 'Zinc (Zn)': 0.03, 'Molybdenum (Mo)': 0, 'Boron (B)': 0.14, 'Silicon (Si)': 19.3, 'Cobalt (Co)': 0.004 
+    },
 ];
 
 const params = {
     _nft_metadata: {
+        _category_name: -1,
+        _category_no: -1,
         'No.': -1,
-        // category: -1,
-        'Category': '',
+        // 'Category': '',
         'eDNA Target': '',
         'eDNA Sequences': -1,
         'eDNA Fraction (%)': -1,
@@ -63,9 +68,10 @@ const params = {
         'Cobalt (Co)': -1,
     },
     prop_sets: {
-        set: [null, [null]], // this makes an empty dropdown
         seq_no: [1, 1, undefined, 1],
         idx: [0, 0, undefined, 1],
+        set_no: [1, 1, undefined, 1],
+        set: [null, [null]], // this makes an empty dropdown // moved to bottom by changing options
     },
     info: {
         // seq_no: '',

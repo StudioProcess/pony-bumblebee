@@ -53,6 +53,9 @@ async function setup() {
     gui.get('prop_sets', 'set').options( Object.keys(properties) ).onChange( set_name => {
         propman.select(set_name, 0);
     });
+    gui.get('prop_sets', 'set_no').onChange( set_no => {
+        propman.select(set_no-1, 0);
+    });
     gui.get('prop_sets', 'idx').onChange( idx => {
         propman.select(params.prop_sets.set, idx);
     });
@@ -135,6 +138,7 @@ function on_prop_set_select(propman) {
     set_props_from_weather();
     
     params.prop_sets.set = propman.set_name;
+    params.prop_sets.set_no = propman.set_idx + 1;
     params.prop_sets.idx = propman.idx;
     params.prop_sets.seq_no = propman.seq_no;
     gui.updateDisplay();
@@ -621,9 +625,10 @@ function draw() {
     gui.get('info', 'weather_wind_dir').setValue(current_weather.wind_deg);
     
     // set nft metadata
+    gui.get('_nft_metadata', '_category_name').setValue(propman.set_name);
+    gui.get('_nft_metadata', '_category_no').setValue(propman.set_idx + 1);
     gui.get('_nft_metadata', 'No.').setValue(propman.seq_no);
-    // gui.get('_nft_metadata', 'category').setValue(propman.set_idx + 1);
-    gui.get('_nft_metadata', 'Category').setValue(propman.set_name);
+    // gui.get('_nft_metadata', 'Category').setValue(propman.set_name);
     gui.get('_nft_metadata', 'eDNA Target').setValue(edna_path);
     gui.get('_nft_metadata', 'eDNA Sequences').setValue(current_root.value);
     gui.get('_nft_metadata', 'eDNA Fraction (%)').setValue((current_root.fraction_total * 100).toFixed(2));
