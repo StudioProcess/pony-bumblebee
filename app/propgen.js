@@ -8,8 +8,6 @@
 // return array
 //
 
-
-
 // Compute array of linear numbers
 export function linear(range, count = 1, options = {}) {
     options = Object.assign({}, {
@@ -174,11 +172,20 @@ export function generate_values(props, count = 1, options = {}) {
     
     for (let prop of props) {
         let [prop_name, fn_name, value_or_range, fn_options] = prop;
-        // check if fn exists
-        if (! Object.keys(fn).includes(fn_name)) {
-            throw { error: `not a valid property function: ${fn_name}` };
+        if (fn_name === 'copy') {
+            // copy values of another property (has to be defined before)
+            const prop_to_copy = value_or_range;
+            if ( ! Object.keys(out).includes(prop_to_copy) ) {
+                throw { error: `property to copy not defined: ${prop_to_copy}` };
+            }
+            out[prop_name] = out[prop_to_copy];
+        } else {
+            // check if fn exists
+            if (! Object.keys(fn).includes(fn_name)) {
+                throw { error: `not a valid property function: ${fn_name}` };
+            }
+            out[prop_name] = fn[fn_name](value_or_range, count, fn_options);
         }
-        out[prop_name] = fn[fn_name](value_or_range, count, fn_options);
     }
     
     // if (options.zip) {
@@ -265,7 +272,7 @@ export function make_param_driver(paramobj, props, count, seed = 0) {
 //     },
 //     ...
 // }
-export function make_prop_set_manager(properties, params, on_select = undefined, initial_seq_no = 1) {
+export function make_prop_set_manager(properties, params, on_select = undefined, initial_seq_no = 1, seed = 1) {
     let param_driver;
     
     const obj = {
@@ -339,7 +346,9 @@ export function make_prop_set_manager(properties, params, on_select = undefined,
             obj.set_name = new_set_name;
             obj.set_idx = new_set_idx;
             const prop_set = properties[obj.set_name];
-            param_driver = make_param_driver(params, prop_set.props, prop_set.count, 1);
+            const _seed = seed === 0 ? 0 : seed + obj.set_idx; // use different seed for each set
+            // console.log("SETTING SEED", _seed);
+            param_driver = make_param_driver(params, prop_set.props, prop_set.count, _seed);
             // console.log(param_driver);
         }
         

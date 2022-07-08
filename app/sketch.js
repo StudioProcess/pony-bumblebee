@@ -22,8 +22,6 @@ let d_weather, current_weather; // weather data
 let propman; // property manager
 let animator, animated = {};
 
-console.log('loading module');
-
 // rendering properties of the elements to be drawn
 // contains visible elements only
 const el = {
@@ -46,9 +44,11 @@ async function setup() {
     gui = new lil.GUI;
     gui.title(title_string());
     gui.addAll(params);
-    gui.get('global')?.close();
-    gui.get('color').close();
     gui.get('_nft_metadata').close();
+    gui.get('global')?.close();
+    gui.get('general').close();
+    gui.get('color').close();
+    gui.get('animation').close();
     
     gui.get('prop_sets', 'set').options( Object.keys(properties) ).onChange( set_name => {
         propman.select(set_name, 0);
@@ -120,7 +120,7 @@ async function setup() {
     }
     
     // property manager
-    propman = propgen.make_prop_set_manager(properties, params, on_prop_set_select, config.initial_seq_no); // last param is starting seq.no
+    propman = propgen.make_prop_set_manager(properties, params, on_prop_set_select, config.initial_seq_no, config.propman_seed); 
     window.propman = propman;
     
     // renderer
@@ -400,7 +400,7 @@ function draw_element(options) {
         pony_quad(
             -options.w/2, -options.h/2, 
             options.w, options.h,
-            params.quad_inset_top, params.quad_inset_right
+            params.general.quad_inset_top, params.general.quad_inset_right
         );
     } else if (options.form === 'ellipse') {
         ellipse(0, 0, options.w, options.h);
@@ -485,12 +485,12 @@ function draw_recursive(node, max_depth = null, box = [-50, -50, 100, 100], dir 
         if (dir) {
             let w = box[2] * child.fraction;
             let h = box[3];
-            draw_recursive( child, max_depth, [x, y, w, h], params.rect_split_alternate ? !dir : dir );
+            draw_recursive( child, max_depth, [x, y, w, h], params.general.split_alternate ? !dir : dir );
             x += w;
         } else {
             let w = box[2];
             let h = box[3] * child.fraction;
-            draw_recursive( child, max_depth, [x, y, w, h], params.rect_split_alternate ? !dir : dir );
+            draw_recursive( child, max_depth, [x, y, w, h], params.general.split_alternate ? !dir : dir );
             y += h;
         }
     }
@@ -500,7 +500,7 @@ function draw_recursive(node, max_depth = null, box = [-50, -50, 100, 100], dir 
 
 // create an array of colors according to the color.* parameters
 function make_colors(num, seed = 0) {
-    if (seed !== 0) { randomSeed(seed); }
+    randomSeed(seed);
     let out = [];
     
     // the three colors to be used
@@ -550,10 +550,8 @@ function make_forms(num, seed = 0) {
           out.push(forms[0]);
         };
     }
-    if (seed !== 0) {
-        randomSeed(seed);
-        out = util.shuffle(out);
-    }
+    randomSeed(seed);
+    out = util.shuffle(out);
     if (num > 0 && params.properties.root_round_chance > 0) {
         if (random() < params.properties.root_round_chance) { 
             out[0] = forms[1];
@@ -570,10 +568,8 @@ function make_stroked(num, seed = 0) {
         if (i < n) out.push(true);
         else out.push(false);
     }
-    if (seed !== 0) {
-        randomSeed(seed);
-        out = util.shuffle(out);
-    }
+    randomSeed(seed);
+    out = util.shuffle(out);
     return out;
 }
 
@@ -645,9 +641,9 @@ function draw() {
     // determine element rendering properties
     el.idx = 0;
     el.count = draw_count; // total number of elements to draw (unused)
-    el.colors = make_colors(draw_count, params.fill_seed);
-    el.forms = make_forms(draw_count, params.form_seed);
-    el.stroked = make_stroked(draw_count, params.stroked_seed);
+    el.colors = make_colors(draw_count, params.general.fill_seed);
+    el.forms = make_forms(draw_count, params.general.form_seed);
+    el.stroked = make_stroked(draw_count, params.general.stroked_seed);
 
     stroke(params.color.stroke);
     fill('#fafafa');
@@ -669,7 +665,7 @@ function draw() {
         edna.root,
         max_depth,
         [ -params.element.w/2, -params.element.h/2, params.element.w, params.element.h ],
-        params.rect_split_dir
+        params.general.split_dir
     );
     pop();
     

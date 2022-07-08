@@ -26,6 +26,7 @@ const config = {
         metadata: 'metadata',
     },
     noloop_after_render: true,
+    propman_seed: 1, // Note: 0 is random
 };
 
 const soil_data = [
@@ -39,7 +40,7 @@ const soil_data = [
 
 const params = {
     _nft_metadata: {
-        _category_name: -1,
+        _category_name: '',
         _category_no: -1,
         'No.': -1,
         // 'Category': '',
@@ -59,13 +60,13 @@ const params = {
         'Nitrogen (N)': -1,
         'Sulfate (SO4)': -1,
         'Iron (Fe)': -1,
-        'Manganese (Mn)': -1,
-        'Copper (Cu)': -1,
-        'Zinc (Zn)': -1,
-        'Molybdenum (Mo)': -1,
-        'Boron (B)': -1,
-        'Silicon (Si)': -1,
-        'Cobalt (Co)': -1,
+        // 'Manganese (Mn)': -1,
+        // 'Copper (Cu)': -1,
+        // 'Zinc (Zn)': -1,
+        // 'Molybdenum (Mo)': -1,
+        // 'Boron (B)': -1,
+        // 'Silicon (Si)': -1,
+        // 'Cobalt (Co)': -1,
     },
     prop_sets: {
         seq_no: [1, 1, undefined, 1],
@@ -113,6 +114,15 @@ const params = {
         path_to_root: true,
         root_round_chance: [-1, -0.01, 1, 0.01],
     },
+    general: {
+        quad_inset_top: [0.06, undefined, undefined, 0.001],
+        quad_inset_right: [0.04125, undefined, undefined, 0.001],
+        split_dir: ['horizontal', { horizontal:true, vertical:false }],
+        split_alternate: true,
+        fill_seed: 1,
+        form_seed: 1,
+        stroked_seed: 1,
+    },
     element: {
        w: 1500,
        h: 1500,
@@ -143,7 +153,7 @@ const params = {
             fill_s: [0, undefined, undefined, 0.01],
             fill_l: [0, undefined, undefined, 0.01],
             fill_a: [0.15, undefined, undefined, 0.01],
-        }
+        },
     },
     bee: {
         displace_enabled: true,
@@ -192,15 +202,6 @@ const params = {
         animation: true,
         animation_frames: 300,
     },
-    fill_seed: 1,
-    form_seed: 1,
-    stroked_seed: 1,
-    quad_inset_top: [0.06, undefined, undefined, 0.001],
-    quad_inset_right: [0.04125, undefined, undefined, 0.001],
-    rect_split_dir: ['horizontal', { horizontal:true, vertical:false }],
-    rect_split_alternate: true,
-    max_depth: [7,  0, 7, 1],
-    // bbox: true,
 };
 
 export { config, params, soil_data };
