@@ -2,6 +2,7 @@ const config = {
     W: 3840,
     H: 3840,
     FPS: 30,
+    CHUNK_SIZE_MB: 200,
     // edna_data_file: './data/2022-03-14 TestFile_KronaChart_SkriptReadIn - TestFile_KronaChart_SkriptReadIn.csv',
     // edna_sample: 'Test',
     edna_data_file: './data/2022-06-15 IA-2022-04 Complete.csv',
@@ -27,7 +28,6 @@ const config = {
     },
     noloop_after_render: true,
     propman_seed: 1, // Note: 0 is random
-    CHUNK_SIZE_MB: 200,
 };
 
 const soil_data = [
