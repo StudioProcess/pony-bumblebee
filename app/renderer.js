@@ -85,8 +85,10 @@ export async function render_list(seq_nos, limit = 0, anim_frames = 0) {
                 recorder.setInfo(info);
                 
                 // add metadata
-                const metadata_folder = config.rendering_use_folders ? config.rendering_folders.metadata + '/' : '';
-                recorder.addJSONToTarball(propman.params, `${metadata_folder}${seq_no.toString().padStart(4,'0')}.json`);
+                if (!animating) {
+                    const metadata_folder = config.rendering_use_folders ? config.rendering_folders.metadata + '/' : '';
+                    recorder.addJSONToTarball(propman.params, `${metadata_folder}${seq_no.toString().padStart(4,'0')}.json`);
+                }
                 
                 if (with_anim && !stop_requested) {
                     if (animating) {
