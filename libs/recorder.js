@@ -255,7 +255,7 @@ function saveTarball(options = {last:false}) {
   if (options && options.last && state.tarSequence == 0) {
     seq = '';
   } else {
-    seq = '_' + ('' + state.tarSequence++).padStart(3, '0');
+    seq = '_' + ('' + state.tarSequence++).padStart(4, '0'); // increased this for PONY rendering 
   }
   saveBlob( tape.save(), state.tarFilename + seq + '.tar');
   state.tarDownloadedSize += tape.length;
