@@ -434,7 +434,7 @@ class Timer {
                 return elapsed;
             } else {
                 const time = new Date(elapsed);
-                const hh = time.getUTCHours().toString().padStart(2, '0');
+                const hh = Math.floor(time.getTime()/1000/3600).toString().padStart(2, '0'); // Note: Don't use .getUTCHours() (wraps after 24h)
                 const mm = time.getUTCMinutes().toString().padStart(2, '0');
                 const ss = time.getUTCSeconds().toString().padStart(2, '0');
                 return `${hh}:${mm}:${ss}`;
