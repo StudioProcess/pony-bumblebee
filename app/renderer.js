@@ -74,7 +74,7 @@ export async function render_list(seq_nos, limit = 0, anim_frames = 0) {
     
     return new Promise(resolve => {
         recorder.start({
-            chunk: 100, // max tar size in MB
+            chunk: config.CHUNK_SIZE_MB, // max tar size in MB
             onUpdate: function() {
                 // Note: the current frame was just recorded (given by current seq_no, anim_idx) -> update count if it wasn't an animation frame
                 if (!animating) { count += 1; }

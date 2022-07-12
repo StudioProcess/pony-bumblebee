@@ -27,6 +27,7 @@ const config = {
     },
     noloop_after_render: true,
     propman_seed: 1, // Note: 0 is random
+    CHUNK_SIZE_MB: 200,
 };
 
 const soil_data = [
