@@ -233,27 +233,42 @@ def format_runs(runs):
     return ', '.join(strings)
 
 def check_complete(files, start_idx, stop_idx, idx_width=4, prefix='', postfix='.png'):
+    # files ... anything that supports the 'in' operator: list, dict, set
     for i in range(start_idx, stop_idx):
         name = prefix + str(i).zfill(idx_width) + postfix
         if name not in files: return False
     return True
+
+def partition_framelist(frames):
+    # frames/0001/0001_0000.png, frames/0001/0001_0001.png, ..., frames/0002/0002_0000.png, frames/0002/0002_0001.png, ...
+    # returns dict: seq_no -> [list of paths]
+    out = {}
+    start = len(TAR_FRAMES_DIR) + 1
+    end = start + 4
+    for path in frames:
+        no = int( path[start:end] )
+        if no not in out: out[no] = []
+        part = out[no]
+        part.append(path)
+    return out
 
 def check_files(files, pwd = None):
     '''check tar contents: stills, movies, metadata for completeness'''
     print(f'Checking {len(files)} files')
     # files = list(set(files))
     # print(f'{len(files)} files without duplicates')
-    files = sorted(files)
+    # files = sorted(files)
     
     # check images
-    images = list( filter(lambda x: x.startswith(TAR_IMAGES_DIR + '/'), files) )
+    images = set( filter(lambda x: x.startswith(TAR_IMAGES_DIR + '/'), files) )
     print(f'{len(images)} images')
     if len(images) == 0:
         print(f'   {COLORS.YELLOW}NO images{COLORS.END}')
     else:
         images_complete = check_complete(images, 1, CHECK_IMAGES, prefix=TAR_IMAGES_DIR + '/')
         print(f'   {COLORS.GREEN}images COMPLETE{COLORS.END}' if images_complete else f'   {COLORS.YELLOW}images NOT complete{COLORS.END}')
-        image_numbers = list(map(lambda x: int(os.path.splitext(os.path.basename(x))[0]), images));
+        image_numbers = list(map(lambda x: int(os.path.splitext(os.path.basename(x))[0]), images))
+        image_numbers.sort()
         image_runs = runs(image_numbers)
         print(f'   {len(image_runs)} image runs', end='')
         if (len(image_runs) < 100): print(f': {format_runs(image_runs)}')
@@ -261,6 +276,7 @@ def check_files(files, pwd = None):
         # check PNG integrity
         if pwd: # only if working directory is given, are we dealing with extracted files
             paths = list(map(lambda x: os.path.join(pwd, x), images))
+            paths.sort()
             errors = check_pngs(paths)
             if len(errors) == 0:
                 print(f'   {COLORS.GREEN}image integrity VERIFIED{COLORS.END}')
@@ -270,7 +286,7 @@ def check_files(files, pwd = None):
                 print(f'   {", ".join(errors)}')
     
     # check metadata
-    meta = list( filter(lambda x: x.startswith(TAR_META_DIR + '/'), files) )
+    meta = set( filter(lambda x: x.startswith(TAR_META_DIR + '/'), files) )
     # meta = list( set(meta) ) # remove duplicates
     print(f'{len(meta)} metadata files')
     if len(meta) == 0:
@@ -278,7 +294,8 @@ def check_files(files, pwd = None):
     else:
         meta_complete = check_complete(meta, 1, CHECK_IMAGES, prefix=TAR_META_DIR + '/', postfix='.json')
         print(f'   {COLORS.GREEN}metadata COMPLETE{COLORS.END}' if meta_complete else f'   {COLORS.YELLOW}metadata NOT complete{COLORS.END}')
-        meta_numbers = list(map(lambda x: int(os.path.splitext(os.path.basename(x))[0]), meta));
+        meta_numbers = list(map(lambda x: int(os.path.splitext(os.path.basename(x))[0]), meta))
+        meta_numbers.sort()
         meta_runs = runs(meta_numbers)
         meta_matches_images = (meta_runs == image_runs)
         print(f'   {COLORS.GREEN}metadata MATCHES images{COLORS.END}' if meta_matches_images else f'   {COLORS.YELLOW}metadata NOT matching images{COLORS.END}')
@@ -289,6 +306,7 @@ def check_files(files, pwd = None):
         # check JSON integrity
         if pwd: # only if working directory is given, are we dealing with extracted files
             paths = list(map(lambda x: os.path.join(pwd, x), meta))
+            paths.sort()
             errors = check_jsons(paths)
             if len(errors) == 0:
                 print(f'   {COLORS.GREEN}metadata integrity VERIFIED{COLORS.END}')
@@ -298,20 +316,21 @@ def check_files(files, pwd = None):
                 print(f'   {", ".join(errors)}')
     
     # check frames
-    frames = list( filter(lambda x: x.startswith(TAR_FRAMES_DIR + '/'), files) )
+    frames = set( filter(lambda x: x.startswith(TAR_FRAMES_DIR + '/'), files) )
     print(f'{len(frames)} frames')
     if len(frames) == 0:
         print(f'   {COLORS.YELLOW}NO frames {COLORS.END}')
     else:
         # print(frames)
         complete_anims = []
+        incomplete = 0
         for no in range(1, CHECK_IMAGES+1):
             no_formatted = str(no).zfill(4)
             complete = check_complete(frames, 0, CHECK_FRAMES-1, prefix=f'{TAR_FRAMES_DIR}/{no_formatted}/{no_formatted}_')
-            if complete:
-                complete_anims.append(no)
-                if no % 100 == 0: print(f'   found complete anims: {len(complete_anims)}')
-        print(f'   {len(complete_anims)} complete anims')
+            if complete: complete_anims.append(no)
+            else: incomplete += 1
+            if no % 100 == 0: print(f'   found complete anims: {len(complete_anims)}, incomplete: {incomplete}')
+        print(f'   {len(complete_anims)} complete anims, {incomplete} incomplete')
         anims_complete = (len(complete_anims) == CHECK_IMAGES)
         print(f'   {COLORS.GREEN}frames COMPLETE{COLORS.END}' if meta_complete else f'   {COLORS.YELLOW}frames NOT complete{COLORS.END}')
         anim_runs = runs(complete_anims)
@@ -323,13 +342,13 @@ def check_files(files, pwd = None):
         else: print()
         # check frames integrity
         if pwd: # only if working directory is given, are we dealing with extracted files
-            paths = list(map(lambda x: os.path.join(pwd, x), frames))
+            paths = list(frames)
+            paths.sort()
             error_nos = []
             errors = []
             ok = 0
-            for no in range(1, CHECK_IMAGES+1):
-                anim_frames = list(filter(lambda x: x.startswith(f'frames/{no:04d}/'), frames)) # only frames for this animation sequence
-                if len(anim_frames) == 0: continue # skip
+            partitions = partition_framelist(paths) # dict with frames grouped by animation sequence
+            for no, anim_frames in partitions.items():
                 paths = list(map(lambda x: os.path.join(pwd, x), anim_frames))
                 anim_errors = check_pngs(paths)
                 if len(anim_errors) > 0:
@@ -359,7 +378,7 @@ def check_pngs(files):
             print(f'      {COLORS.RED}CORRUPT image: {file}{COLORS.END}')
         else: ok += 1
         if (i+1) % 100 == 0:
-            print(f'      images verified: {ok}/{len(files)}, corrupt {len(errors)}/{len(files)}')
+            print(f'      images verified: {ok}/{len(files)}, corrupt: {len(errors)}/{len(files)}')
     return errors
 
 def check_json(path):
@@ -379,8 +398,8 @@ def check_jsons(files):
             errors.append(file)
             print(f'      {COLORS.RED}CORRUPT json: {file}{COLORS.END}')
         else: ok += 1
-        if (i+1) % 10 == 0:
-            print(f'      json verified: {ok}/{len(files)}, corrupt {len(errors)}/{len(files)}')
+        if (i+1) % 100 == 0:
+            print(f'      json verified: {ok}/{len(files)}, corrupt: {len(errors)}/{len(files)}')
     return errors
 
 def limit_range(names, from_=0, to=0):
