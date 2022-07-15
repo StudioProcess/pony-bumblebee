@@ -31,7 +31,7 @@ TAR_IMAGES_DIR = 'images'
 TAR_FRAMES_DIR = 'frames'
 TAR_META_DIR = 'metadata'
 OUT_SHEETS_DIR = 'overviews'
-OUT_MOVIES_DIR = 'movies'
+OUT_MOVIES_DIR = 'videos'
 
 SHEET_PREFIX = 'overview_'
 
