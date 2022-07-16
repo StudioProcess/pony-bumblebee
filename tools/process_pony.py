@@ -23,6 +23,12 @@
     --check_integrity ... check presence as well as png and json file integrity in extracted folder
     
     --archive ... compress stuff from extracted folder ('all', 'images', 'frames', 'movies', 'meta', 'sheets')
+    
+    Required utilities:
+    * tar
+    * zip
+    * ffmpeg
+    * graphicsmagick
 '''
 
 OUTDIR_SUFFIX = '_processed'
