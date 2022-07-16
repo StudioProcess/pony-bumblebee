@@ -23,10 +23,12 @@
     --check_integrity ... check presence as well as png and json file integrity in extracted folder
     
     --archive ... compress stuff from extracted folder ('all', 'images', 'frames', 'movies', 'meta', 'sheets')
+    --001 ... use split utility to produce .zip.001, .zip.002, etc. instead of multipart .zip, .z01, .z02, etc.
     
     Required utilities:
     * tar
     * zip
+    * split
     * ffmpeg
     * graphicsmagick
 '''
@@ -419,7 +421,7 @@ def limit_range(names, from_=0, to=0):
         return True
     return list( filter(in_range, names) )
     
-def run_archive(target, src_folder, dest_folder):
+def run_archive(target, src_folder, dest_folder, use_001=False):
     target_to_folder = {
         'meta': TAR_META_DIR,
         'sheets': OUT_SHEETS_DIR,
@@ -435,8 +437,24 @@ def run_archive(target, src_folder, dest_folder):
     zip_path_relative = os.path.join(dest_folder, fname) + '.zip'
     zip_path_absolute = os.path.join( os.path.abspath(dest_folder), fname) + '.zip'
     if os.path.exists(zip_path_absolute): os.remove(zip_path_absolute) # need to remove manually, since zip won't overwrite
-    print(f'Archiving {target}: {in_folder_relative} -> {zip_path_relative}')
-    run_cmd(f'cd {src_folder}; zip -s 1g -r \'{zip_path_absolute}\' {fname}') # need to cd into the folder, so the zip contains correct relative paths
+    print(f'Archiving {target}: {in_folder_relative} -> {zip_path_relative}{"[.001]" if use_001 else ""}')
+    if not use_001: run_cmd(f'cd {src_folder}; zip -s 1g -r \'{zip_path_absolute}\' {fname}') # need to cd into the folder, so the zip contains correct relative paths
+    else:
+        s = '-d' if sys.platform == 'darwin' else '--numeric-suffixes=1' # starting index not supported on darwin (will start at 000)
+        run_cmd(f'cd {src_folder}; zip -r - {fname} | split {s} -a 3 -b 10m - \'{zip_path_absolute}.\'')
+        parts = glob.glob(f'{zip_path_absolute}.*')
+        # remove suffix if only one file
+        if len(parts) == 1:
+            os.rename( parts[0], os.path.splitext(parts[0])[0] )
+        # rename on darwin so index starts at 001 (no need to rename if suffix was already removed)
+        elif sys.platform == 'darwin':     
+            parts.sort(reverse=True)
+            for part in parts:
+                split = os.path.splitext(part)
+                new_num = int( split[1][1:] ) + 1 
+                new_suffix = f'.{new_num:03d}'
+                os.rename( part, split[0] + new_suffix )
+
 
 extract_default = True
 sheets_default = True
@@ -458,6 +476,7 @@ if __name__ == '__main__':
     parser.add_argument('--check_extracted', action='store_true', default=False)
     parser.add_argument('--check_integrity', action='store_true', default=False)
     parser.add_argument('--archive', type=str, default=None) # 'all', 'images', 'frames', 'movies', 'meta', 'sheets'
+    parser.add_argument('--001', action='store_true', default=False)
     
     # valid for extract, sheets and movies (for extract :counts tar files, not image sequence numbers)
     parser.add_argument('--from', type=int, default=0)
@@ -585,7 +604,7 @@ if __name__ == '__main__':
         else: 
             print(f'\nARCHIVE: {", ".join(targets)}')
             for target in targets:
-                run_archive(target, extract_folder, out_folder)
+                run_archive(target, extract_folder, out_folder, getattr(args, '001'))
     
     print()
     print_elapsed()
