@@ -85,7 +85,7 @@ def put(source_path, target_folder = '/', retry = RETRIES):
                     while code != 0 and ( retry == -1 or tries < retry + 1 ):
                         if tries > 0: 
                             sleep = min(RETRY_SLEEP[0] * tries, RETRY_SLEEP[1])
-                            print(f'   Retry {tries}/{retry if retry > 0 else '∞'}, waiting {sleep}s...')
+                            print(f'   Retry {tries}/{retry if retry > 0 else "∞"}, waiting {sleep}s...')
                             time.sleep(sleep)
                         small = os.path.getsize(src) < 100 * 1_000_000 # 100 MB
                         code = upload_file(src, dst, silent=small, prefix=f'({count}) ')
