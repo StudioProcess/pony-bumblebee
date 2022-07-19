@@ -62,6 +62,8 @@ MOVIE_ENCODE = (f'-c:v libx264 -profile:v main -level:v 6 -crf {MOVIE_CRF_H264} 
 CHECK_IMAGES = 8760
 CHECK_FRAMES = 300
 
+ZIP_SPLIT = '1g'
+
 import sys
 import os
 import os.path
@@ -438,10 +440,10 @@ def run_archive(target, src_folder, dest_folder, use_001=False):
     zip_path_absolute = os.path.join( os.path.abspath(dest_folder), fname) + '.zip'
     if os.path.exists(zip_path_absolute): os.remove(zip_path_absolute) # need to remove manually, since zip won't overwrite
     print(f'Archiving {target}: {in_folder_relative} -> {zip_path_relative}{"[.001]" if use_001 else ""}')
-    if not use_001: run_cmd(f'cd {src_folder}; zip -s 1g -r \'{zip_path_absolute}\' {fname}') # need to cd into the folder, so the zip contains correct relative paths
+    if not use_001: run_cmd(f'cd {src_folder}; zip -s {ZIP_SPLIT} -r \'{zip_path_absolute}\' {fname}') # need to cd into the folder, so the zip contains correct relative paths
     else:
         s = '-d' if sys.platform == 'darwin' else '--numeric-suffixes=1' # starting index not supported on darwin (will start at 000)
-        run_cmd(f'cd {src_folder}; zip -r - {fname} | split {s} -a 3 -b 10m - \'{zip_path_absolute}.\'')
+        run_cmd(f'cd {src_folder}; zip -r - {fname} | split {s} -a 3 -b {ZIP_SPLIT} - \'{zip_path_absolute}.\'')
         parts = glob.glob(f'{zip_path_absolute}.*')
         # remove suffix if only one file
         if len(parts) == 1:
