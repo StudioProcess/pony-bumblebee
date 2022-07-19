@@ -62,7 +62,7 @@ MOVIE_ENCODE = (f'-c:v libx264 -profile:v main -level:v 6 -crf {MOVIE_CRF_H264} 
 CHECK_IMAGES = 8760
 CHECK_FRAMES = 300
 
-ZIP_SPLIT = '1g'
+ZIP_SPLIT = '5g'
 
 import sys
 import os
