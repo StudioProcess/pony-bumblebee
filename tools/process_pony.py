@@ -443,7 +443,7 @@ def run_archive(target, src_folder, dest_folder, use_001=False):
     if not use_001: run_cmd(f'cd {src_folder}; zip -s {ZIP_SPLIT} -r \'{zip_path_absolute}\' {fname}') # need to cd into the folder, so the zip contains correct relative paths
     else:
         s = '-d' if sys.platform == 'darwin' else '--numeric-suffixes=1' # starting index not supported on darwin (will start at 000)
-        run_cmd(f'cd {src_folder}; zip -r - {fname} | split {s} -a 3 -b {ZIP_SPLIT} - \'{zip_path_absolute}.\'')
+        run_cmd(f'cd {src_folder}; zip -r - {fname} | split {s} -a 3 -b {ZIP_SPLIT.upper()} - \'{zip_path_absolute}.\'')
         parts = glob.glob(f'{zip_path_absolute}.*')
         # remove suffix if only one file
         if len(parts) == 1:
