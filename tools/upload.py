@@ -39,7 +39,7 @@ def make_dir(target_folder, silent = True, prefix = ''):
 def upload_file(src, dst, silent = True, prefix = ''):
     print(f'{prefix}Uploading {src} -> {dst}')
     redir = ' > /dev/null 2>&1' if silent else ''
-    return run_cmd(f"dbxcli put {src} {dst}{redir}")
+    return run_cmd(f"dbxcli put '{src}' '{dst}'{redir}")
 
 
 def put(source_path, target_folder = '/', retry = 3):
@@ -59,6 +59,7 @@ def put(source_path, target_folder = '/', retry = 3):
     
     if os.path.isdir(source_path):
         # we want to copy the dir itself, append it to the target
+        if source_path.endswith('/'): source_path = source_path[:-1]
         target_folder = os.path.join(target_folder, os.path.basename(source_path))
     
     if os.path.isdir(source_path):
