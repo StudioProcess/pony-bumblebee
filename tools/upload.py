@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+
+RETRIES = 10
+
 import subprocess
 import argparse
 import os.path
@@ -6,6 +9,7 @@ import signal
 import time
 import datetime
 import math
+
 
 class COLORS:
     GREEN = '\033[92m'
@@ -42,7 +46,7 @@ def upload_file(src, dst, silent = True, prefix = ''):
     return run_cmd(f"dbxcli put '{src}' '{dst}'{redir}")
 
 
-def put(source_path, target_folder = '/', retry = 3):
+def put(source_path, target_folder = '/', retry = RETRIES):
     if not os.path.exists(source_path):
         print(f'File/folder doesn\'t exists: {source_path}')
     
@@ -85,7 +89,7 @@ def put(source_path, target_folder = '/', retry = 3):
                     if code == 0: ok += 1
                     else:
                         fail += 1
-                        print(f'   FAILED')
+                        print(f'   {COLORS.RED}FAILED ({code}){COLORS.END}')
                         fails.append(f"./upload.py '{src}' '{os.path.dirname(dst)}'")
                     print_stats()
                         
@@ -97,7 +101,7 @@ def put(source_path, target_folder = '/', retry = 3):
                     ok += 1
                 else:
                     fail += 1
-                    print(f'   FAILED')
+                    print(f'   {COLORS.RED}FAILED ({code}){COLORS.END}')
                     fails.append(f"EMPTY DIR: '{dst}'")
                 print_stats()
     else:
