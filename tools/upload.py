@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
-RETRIES = 10
+RETRIES = -1 # 0 is no retries, -1 is indefinite retries
+RETRY_SLEEP = [5, 50]
 
 import subprocess
 import argparse
@@ -59,7 +60,7 @@ def put(source_path, target_folder = '/', retry = RETRIES):
         if (fail == 0):
             print(f'{prefix}Total: {count}   {COLORS.GREEN}Ok: {ok}{COLORS.END}   Failed: {fail}')
         else:
-            print(f'{prefix}Total: {count}   Ok: {ok}   {COLORS.RED}Failed: {fail}{COLORS.END}')
+            print(f'{prefix}Total: {count}   {COLORS.GREEN}Ok: {ok}{COLORS.END}   {COLORS.RED}Failed: {fail}{COLORS.END}')
     
     if os.path.isdir(source_path):
         # we want to copy the dir itself, append it to the target
@@ -81,8 +82,11 @@ def put(source_path, target_folder = '/', retry = RETRIES):
                     dst = os.path.join(target_folder, target_root, file)
                     code = -1
                     tries = 0
-                    while code != 0 and tries < retry + 1:
-                        if tries > 0: print(f'   Retry {tries}/{retry}')
+                    while code != 0 and ( retry == -1 or tries < retry + 1 ):
+                        if tries > 0: 
+                            sleep = min(RETRY_SLEEP[0] * tries, RETRY_SLEEP[1])
+                            print(f'   Retry {tries}/{retry if retry > 0 else '∞'}, waiting {sleep}s...')
+                            time.sleep(sleep)
                         small = os.path.getsize(src) < 100 * 1_000_000 # 100 MB
                         code = upload_file(src, dst, silent=small, prefix=f'({count}) ')
                         tries += 1
