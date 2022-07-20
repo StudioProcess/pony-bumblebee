@@ -1,7 +1,27 @@
 #!/usr/bin/env python3
 
+'''
+Upload to dropbox
+
+Required utilities:
+dbxcli (v3.0.0) https://github.com/dropbox/dbxcli
+
+Usage:
+./upload.py <source_path> [dest_folder=/]
+
+source_path ... path to local file or folder. 
+                if this is a folder, the whole folder will be placed into the dest_folder on the dropbox
+dest_folder ... path to dropbox folder. default is /, the root of the dropbox
+
+TODOs:
+* allow multiple source paths, or globs
+* --skip=n argument to retry uploads, skipping a number of files
+
+'''
+
 RETRIES = -1 # 0 is no retries, -1 is indefinite retries
-RETRY_SLEEP = [5, 50]
+RETRY_SLEEP = [5, 50] # [0] .. step (is multiplied by retry count), [1] .. max. sleep time
+
 
 import subprocess
 import argparse
