@@ -6,3 +6,5 @@
 * Additional Python-based processing tools 
     * [process_pony.py](tools/process_pony.py): Extract Image Sequences, Generate Contact Sheets, Generate Movies, Archive generated files
     * [upload.py](tools/upload.py): Upload to Dropbox
+
+Deployed at [https://sketch.process.studio/pony-bumblebee/](https://sketch.process.studio/pony-bumblebee/)
