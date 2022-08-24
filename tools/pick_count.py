@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+'''
+Assorted functions to generate integer sequences
+'''
+
 # [1, 974, 1947, 2920, 3893, 4867, 5840, 6813, 7786, 8760]
 # count >= 2
 def pick_count(count=10, num=8760, offset = 1):

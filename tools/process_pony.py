@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Python 3.10
 
 '''
     ./process_tars.py <in_folder> [<out_folder> = .] [options]
