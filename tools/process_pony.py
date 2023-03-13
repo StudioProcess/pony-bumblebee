@@ -2,7 +2,7 @@
 # Python 3.10
 
 '''
-    ./process_tars.py <in_folder> [<out_folder> = .] [options]
+    ./process_pony.py <in_folder> [<out_folder> = .] [options]
     
     Force Quit ... Ctrl-c (SIGINT)
     
