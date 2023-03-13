@@ -48,7 +48,7 @@ MOVIE_FRAMES = 300
 MOVIE_LOOPS = 1
 MOVIE_INPUT_FPS = 25
 MOVIE_OUTPUT_FPS = 25
-MOVIE_SCALE = (-1, -1) # use -1 for both components to keep unchanged
+MOVIE_RES = (-1, -1) # use -1 for both components to keep resolution unchanged
 MOVIE_CRF_H264 = 25 # default 23
 MOVIE_CRF_H265 = 30 # default 28
 
@@ -60,7 +60,7 @@ MOVIE_ENCODE = (f'-c:v libx264 -profile:v main -level:v 6 -crf {MOVIE_CRF_H264} 
 # H265
 #MOVIE_ENCODE = (f'-c:v libx265 -crf {MOVIE_CRF_H265} -preset medium -tag:v hvc1 -pix_fmt yuv420p -color_range tv -colorspace bt709 -color_primaries bt709 -color_trc bt709 -movflags +faststart', 'mp4')
 # GIF
-#MOVIE_ENCODE = (f'-vf "fps={MOVIE_OUTPUT_FPS},scale={MOVIE_SCALE[0]}:{MOVIE_SCALE[1]}:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0', 'gif')
+#MOVIE_ENCODE = (f'-vf "fps={MOVIE_OUTPUT_FPS},scale={MOVIE_RES[0]}:{MOVIE_RES[1]}:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0', 'gif')
 
 CHECK_IMAGES = 8760
 CHECK_FRAMES = 300
@@ -199,7 +199,7 @@ def create_contactsheets(pnglist, dest_folder, size = 500, border_w = 30, border
         pnglist = pnglist[per_page:] # rest of list
 
 def ffmpeg(pattern, in_fps, out_fps, target='out.mp4'):
-    scale = f'-filter:v scale={MOVIE_SCALE[0]}:{MOVIE_SCALE[1]}:force_divisible_by=2:force_original_aspect_ratio=decrease' if MOVIE_SCALE and (MOVIE_SCALE[0] > 0 or MOVIE_SCALE[1] > 0) else ''
+    scale = f'-filter:v scale={MOVIE_RES[0]}:{MOVIE_RES[1]}:force_divisible_by=2:force_original_aspect_ratio=decrease' if MOVIE_RES and (MOVIE_RES[0] > 0 or MOVIE_RES[1] > 0) else ''
     frames = int(MOVIE_FRAMES * MOVIE_LOOPS)
     # signals don't seem to work with os.system, see: https://stackoverflow.com/a/27083472
     if MOVIE_ENCODE[1] == 'gif':
