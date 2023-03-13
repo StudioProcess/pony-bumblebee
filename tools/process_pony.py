@@ -55,6 +55,8 @@ MOVIE_CRF_H265 = 30 # default 28
 # H264 (needs level 5 for 1920, level 6 for 3840)
 # Only '-preset veryslow' produces no artifacts; Adding '-tune animation' fixes artifacts with faster presets, but results in bigger files and worse seeking time; Note: Artifacts only in quicktime player, NOT in VLC; Artifacts appear both on ffmpeg 4.4.2 (Ubuntu) and 5.0.1 (Darwin) 
 MOVIE_ENCODE = (f'-c:v libx264 -profile:v main -level:v 6 -crf {MOVIE_CRF_H264} -preset veryslow -pix_fmt yuv420p -color_range tv -colorspace bt709 -color_primaries bt709 -color_trc bt709 -movflags +faststart', 'mp4')
+# H264 Youtube Recommended Settings https://support.google.com/youtube/answer/1722171 (MP4, faststart, high profile, 2 b-frames, GOP half the framerate, 4:2:0 chroma)
+#MOVIE_ENCODE = (f'-c:v libx264 -profile:v high -level:v 6 -crf {MOVIE_CRF_H264} -preset medium -pix_fmt yuv420p -color_range tv -colorspace bt709 -color_primaries bt709 -color_trc bt709 -movflags +faststart -x264-params bframes=2:keyint={MOVIE_OUTPUT_FPS//2}', 'mp4')
 # H265
 #MOVIE_ENCODE = (f'-c:v libx265 -crf {MOVIE_CRF_H265} -preset medium -tag:v hvc1 -pix_fmt yuv420p -color_range tv -colorspace bt709 -color_primaries bt709 -color_trc bt709 -movflags +faststart', 'mp4')
 # GIF
