@@ -51,12 +51,15 @@ MOVIE_OUTPUT_FPS = 25
 MOVIE_RES = (-1, -1) # use -1 for both components to keep resolution unchanged
 MOVIE_CRF_H264 = 20 # default 23
 MOVIE_CRF_H265 = 25 # default 28
+MOVIE_BITRATE_H264 = 15 # in Mbit (only applies to videotoolbox encoder)
 
 # H264 (needs level 5 for 1920, level 6 for 3840)
 # Only '-preset veryslow' produces no artifacts; Adding '-tune animation' fixes artifacts with faster presets, but results in bigger files and worse seeking time; Note: Artifacts only in quicktime player, NOT in VLC; Artifacts appear both on ffmpeg 4.4.2 (Ubuntu) and 5.0.1 (Darwin) 
 # MOVIE_ENCODE = (f'-c:v libx264 -profile:v main -level:v 6 -crf {MOVIE_CRF_H264} -preset veryslow -pix_fmt yuv420p -color_range tv -colorspace bt709 -color_primaries bt709 -color_trc bt709 -movflags +faststart', 'mp4')
 # H264 Youtube Recommended Settings https://support.google.com/youtube/answer/1722171 (MP4, faststart, high profile, 2 b-frames, GOP half the framerate, 4:2:0 chroma) + from handbrake "creator" preset (level 5.2, ref=1, b-pyramid=none, vbv limits). Testing shows that Level 6 shows artifacts on mac + win (w/hw decoding), while Level 5.2 always works, even though it gives limit warnings.
-MOVIE_ENCODE = (f'-c:v libx264 -profile:v high -level:v 5.2 -crf {MOVIE_CRF_H264} -pix_fmt yuv420p -color_range tv -colorspace bt709 -color_primaries bt709 -color_trc bt709 -movflags +faststart -x264-params bframes=2:keyint={MOVIE_OUTPUT_FPS//2}:ref=1:b-pyramid=none:vbv-bufsize=300000:vbv-maxrate=300000', 'mp4')
+#MOVIE_ENCODE = (f'-c:v libx264 -profile:v high -level:v 5.2 -crf {MOVIE_CRF_H264} -pix_fmt yuv420p -color_range tv -colorspace bt709 -color_primaries bt709 -color_trc bt709 -movflags +faststart -x264-params bframes=2:keyint={MOVIE_OUTPUT_FPS//2}:ref=1:b-pyramid=none:vbv-bufsize=300000:vbv-maxrate=300000', 'mp4')
+# H264 Apple Videotoolbox Framework (on defaults produces L6, CABAC, 2 ref frames, 12 keyframe interval), hw encode, bigger filesize, works out of the box on win/mac w/hw decode
+MOVIE_ENCODE = (f'-c:v h264_videotoolbox -profile:v high -pix_fmt yuv420p -color_range tv -colorspace bt709 -color_primaries bt709 -color_trc bt709 -movflags +faststart -b:v {MOVIE_BITRATE_H264}M', 'mp4')
 # H265
 #MOVIE_ENCODE = (f'-c:v libx265 -crf {MOVIE_CRF_H265} -preset medium -tag:v hvc1 -pix_fmt yuv420p -color_range tv -colorspace bt709 -color_primaries bt709 -color_trc bt709 -movflags +faststart', 'mp4')
 # GIF
