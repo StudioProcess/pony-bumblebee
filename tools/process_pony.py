@@ -6,6 +6,9 @@
     
     Force Quit ... Ctrl-c (SIGINT)
     
+    in_folder:  folder of tar files or of extracted files (if generating only i.e. without using --extract)
+    out_folder: folder for extracted files and/or generated file
+    
     options:
     -y ... skip initial confirmation dialog
     
@@ -16,7 +19,7 @@
     
     --sheets ... generate contact sheets; specify extracted folder with in_folder (when --extract is not present)
         --from, --to ... only the specified sequence numbers
-    --movies ... generate movies specify extracted folder with in_folder (when --extract is not present)
+    --movies ... generate movies; specify extracted folder with in_folder (when --extract is not present)
         --from, --to ... only the specified sequence numbers
     
     --check_tars ... check presence of files within tars
