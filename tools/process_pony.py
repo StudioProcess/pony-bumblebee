@@ -25,6 +25,7 @@
     --check_tars ... check presence of files within tars
     --check_extracted ... check presence of files in extracted folder
     --check_integrity ... check presence as well as png and json file integrity in extracted folder
+    --check_movies ... check movies for errors
     
     --archive ... compress stuff from extracted folder ('all', 'images', 'frames', 'movies', 'meta', 'sheets')
     --001 ... use split utility to produce .zip.001, .zip.002, etc. instead of multipart .zip, .z01, .z02, etc.
@@ -104,7 +105,7 @@ def signal_handler(sig, stack=None):
 def run_cmd(cmd, return_exitcode_only=True):
     # os.system is simple, but will signals won't work
     # shell allows to specify cmd as a single string, as opposed to a list of args
-    completed_process = subprocess.run(cmd, shell=True)
+    completed_process = subprocess.run(cmd, shell=True, capture_output=True, text=True)
     if return_exitcode_only: return completed_process.returncode
     else: return completed_process
 
@@ -422,6 +423,22 @@ def check_jsons(files):
             print(f'      json verified: {ok}/{len(files)}, corrupt: {len(errors)}/{len(files)}')
     return errors
 
+def check_mp4(path):
+    code = run_cmd(f"ffmpeg -v error -i {path} -f null -")
+    return code == 0
+
+def check_mp4s(files):
+    errors = []
+    ok = 0
+    for i, file in enumerate(files):
+        if not check_mp4(file):
+            errors.append(file)
+            print(f'      {COLORS.RED}CORRUPT mp4: {file}{COLORS.END}')
+        else: ok += 1
+        if (i+1) % 10 == 0 or i==len(files)-1:
+            print(f'      mp4 verified: {ok}/{len(files)}, corrupt: {len(errors)}/{len(files)}')
+    return errors
+
 def limit_range(names, from_=0, to=0):
     def in_range(name):
         basename = os.path.os.path.basename(name)
@@ -486,6 +503,7 @@ if __name__ == '__main__':
     parser.add_argument('--check_tars', action='store_true', default=False)
     parser.add_argument('--check_extracted', action='store_true', default=False)
     parser.add_argument('--check_integrity', action='store_true', default=False)
+    parser.add_argument('--check_movies', action='store_true', default=False)
     parser.add_argument('--archive', type=str, default=None) # 'all', 'images', 'frames', 'movies', 'meta', 'sheets'
     parser.add_argument('--001', action='store_true', default=False)
     
@@ -502,6 +520,7 @@ if __name__ == '__main__':
     check_tars = args.check_tars
     check_extracted = args.check_extracted
     check_integrity = args.check_integrity
+    check_movies = args.check_movies
     extract = args.extract
     sheets = args.sheets
     movies = args.movies
@@ -510,7 +529,7 @@ if __name__ == '__main__':
     # print(args)
     
     # if none of the options are enabled use default options
-    if (not extract and not sheets and not movies and not check_tars and not check_extracted and not check_integrity and not archive):
+    if (not extract and not sheets and not movies and not check_tars and not check_extracted and not check_integrity and not check_movies and not archive):
         extract = extract_default
         sheets = sheets_default
         movies = movies_default
@@ -602,6 +621,12 @@ if __name__ == '__main__':
     else:
         print('Skipping MOVIES')
     
+    if check_movies:
+        movies_dir = os.path.join(out_folder, OUT_MOVIES_DIR)
+        print()
+        print(f'CHECK_MOVIES: Checking {movies_dir}')
+        files = list_files_recursive(movies_dir)
+        check_mp4s(files)
     
     if archive: 
         all_targets = ['meta', 'sheets', 'images', 'movies', 'frames']
