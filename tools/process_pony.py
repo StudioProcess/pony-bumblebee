@@ -225,9 +225,9 @@ def create_movies(png_folders, dest_folder):
         print_elapsed()
 
 def print_elapsed():
-    global start_time
-    elapsed = datetime.timedelta(seconds = math.floor(time.time()-start_time) )
-    print(f'Elapsed time: {str(elapsed)}')
+    if start_time:
+        elapsed = datetime.timedelta(seconds = math.floor(time.time()-start_time) )
+        print(f'Elapsed time: {str(elapsed)}')
     
 def runs(nums, sort = True, singles_as_list = True):
     def fn(res, num):
@@ -489,6 +489,8 @@ sheets_default = True
 movies_default = True
 
 if __name__ == '__main__':
+    global start_time
+    start_time = None
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGQUIT, signal_handler)
     
@@ -558,7 +560,6 @@ if __name__ == '__main__':
             print('Exiting')
             exit()
     
-    global start_time
     start_time = time.time()
     
     if check_tars:
