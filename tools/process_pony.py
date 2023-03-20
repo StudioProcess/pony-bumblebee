@@ -105,7 +105,7 @@ def signal_handler(sig, stack=None):
 def run_cmd(cmd, return_exitcode_only=True):
     # os.system is simple, but will signals won't work
     # shell allows to specify cmd as a single string, as opposed to a list of args
-    completed_process = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+    completed_process = subprocess.run(cmd, shell=True, capture_output=(not return_exitcode_only), text=True)
     if return_exitcode_only: return completed_process.returncode
     else: return completed_process
 
