@@ -52,10 +52,10 @@ MOVIE_FRAMES = 300
 MOVIE_LOOPS = 1
 MOVIE_INPUT_FPS = 25
 MOVIE_OUTPUT_FPS = 25
-MOVIE_RES = (-1, -1) # use -1 for both components to keep resolution unchanged
+MOVIE_RES = (1080, 1080) # use -1 for both components to keep resolution unchanged
 MOVIE_CRF_H264 = 20 # default 23
 MOVIE_CRF_H265 = 25 # default 28
-MOVIE_BITRATE_H264 = 15 # in Mbit (only applies to videotoolbox encoder)
+MOVIE_BITRATE_H264 = 5 # in Mbit (only applies to videotoolbox encoder)
 
 # H264 (needs level 5 for 1920, level 6 for 3840)
 # Only '-preset veryslow' produces no artifacts; Adding '-tune animation' fixes artifacts with faster presets, but results in bigger files and worse seeking time; Note: Artifacts only in quicktime player, NOT in VLC; Artifacts appear both on ffmpeg 4.4.2 (Ubuntu) and 5.0.1 (Darwin) 
