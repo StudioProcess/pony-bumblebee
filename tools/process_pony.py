@@ -22,7 +22,7 @@
     --movies ... generate movies; specify extracted folder with in_folder (when --extract is not present)
         --from, --to ... only the specified sequence numbers
     
-    --metadata_to_csv ... generate single csv file of all metadata 
+    --metadata_to_csv ... generate single csv file of all metadata (with special structure according to client)
     
     --check_tars ... check presence of files within tars
     --check_extracted ... check presence of files in extracted folder
@@ -530,8 +530,7 @@ if __name__ == '__main__':
     extract = args.extract
     sheets = args.sheets
     movies = args.movies
-    # metadata_to_csv = args.metadata_to_csv
-    metadata_to_csv = False
+    metadata_to_csv = args.metadata_to_csv
     archive = args.archive
     
     # print(args)
@@ -637,15 +636,29 @@ if __name__ == '__main__':
     
     if metadata_to_csv:
         meta = list_files( os.path.join(extract_folder, TAR_META_DIR), '[0-9]*.json' )
+        print( os.path.join(extract_folder, TAR_META_DIR) )
         print(f'METADATA_TO_CSV: {len(meta)} metadata files found')
-        meta = meta[0:2]
-        print(meta)
-        
-        # import csv
-        # with open() as csvfile:
-        #     writer = csv.write(csvfile)
+        import csv
+        with open(os.path.join(extract_folder, TAR_META_DIR , '_metadata.csv'), 'w') as csvfile:
+            fieldnames = ['ID', 'Name', 'Description', 'Category No.', 'No.', 'Sample', 'Geolocation (Lat, Lon)', 'Timestamp', 'Temperature (°C)', 'Wind Direction (°)', 'Humus (Organic Matter)', 'Calcium (Ca)', 'Magnesium (Mg)', 'Potassium (K)', 'Phosphor (P)', 'Nitrogen (N)', 'Sulfate (SO4)', 'Iron (Fe)', 'eDNA_1_Kingdom', 'eDNA_2_Phylum', 'eDNA_3_Class', 'eDNA_4_Order', 'eDNA_5_Family', 'eDNA_6_Genus', 'eDNA_7_Species', 'Atmospheric Pressure (hPa)', 'Humidity (%)', 'Wind Speed (m/s)']
+            writer = csv.DictWriter(csvfile, fieldnames, extrasaction='ignore')
+            writer.writeheader()
+            for path in meta:
+                with open(path, 'r') as file:
+                    obj = json.load(file)['_nft_metadata']
+                    obj['ID'] = obj['No.']
+                    obj['Name'] = f'PONY EARTH ReArt No. {obj['No.']}'
+                    obj['Description'] = f'PONY EARTH ReArt No. {obj['No.']}. The original PONY EARTH ReArt is based on biodiversity data captured on the first living lab and birthplace of PONY EARTH in Austria.'
+                    obj['Category No.'] = obj['_category_no']
+                    for key, val in obj['_edna_target'].items():
+                        parts = key.split('_')
+                        parts[1].title()
+                        if val == '*': val = '--'
+                        obj[f'eDNA_{parts[0]}_{parts[1].title()}'] = val
+                    for key, val in obj['_weather_extra'].items():
+                        obj[key] = val
+                    writer.writerow(obj)
 
-        
     
     if archive: 
         all_targets = ['meta', 'sheets', 'images', 'movies', 'frames']
