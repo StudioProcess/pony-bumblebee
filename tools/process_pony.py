@@ -22,6 +22,8 @@
     --movies ... generate movies; specify extracted folder with in_folder (when --extract is not present)
         --from, --to ... only the specified sequence numbers
     
+    --metadata_to_csv ... generate single csv file of all metadata 
+    
     --check_tars ... check presence of files within tars
     --check_extracted ... check presence of files in extracted folder
     --check_integrity ... check presence as well as png and json file integrity in extracted folder
@@ -110,11 +112,12 @@ def run_cmd(cmd, return_exitcode_only=True):
     else: return completed_process
 
 # patterns are matches using fnmatch https://docs.python.org/3/library/fnmatch.html
-def list_files(folder, pattern = '*'):
+def list_files(folder, pattern = '*', ignore_hidden = True):
     try:
         files = os.listdir(folder)
     except FileNotFoundError:
         return []
+    if ignore_hidden: pattern = '[!.]' + pattern
     files = filter(lambda x: os.path.isfile(folder + '/' + x), files)
     files = list( filter(lambda x: fnmatch.fnmatch(x, pattern), files) ) 
     files.sort()
@@ -500,6 +503,7 @@ if __name__ == '__main__':
     parser.add_argument('--extract', action='store_true', default=False)
     parser.add_argument('--sheets', action='store_true', default=False)
     parser.add_argument('--movies',  action='store_true', default=False)
+    parser.add_argument('--metadata_to_csv',  action='store_true', default=False)
     parser.add_argument('-y', action='store_true', default=False)
     
     parser.add_argument('--check_tars', action='store_true', default=False)
@@ -526,12 +530,14 @@ if __name__ == '__main__':
     extract = args.extract
     sheets = args.sheets
     movies = args.movies
+    # metadata_to_csv = args.metadata_to_csv
+    metadata_to_csv = False
     archive = args.archive
     
     # print(args)
     
     # if none of the options are enabled use default options
-    if (not extract and not sheets and not movies and not check_tars and not check_extracted and not check_integrity and not check_movies and not archive):
+    if (not extract and not sheets and not movies and not metadata_to_csv and not check_tars and not check_extracted and not check_integrity and not check_movies and not archive):
         extract = extract_default
         sheets = sheets_default
         movies = movies_default
@@ -628,6 +634,18 @@ if __name__ == '__main__':
         print(f'CHECK_MOVIES: Checking {movies_dir}')
         files = list_files_recursive(movies_dir)
         check_mp4s(files)
+    
+    if metadata_to_csv:
+        meta = list_files( os.path.join(extract_folder, TAR_META_DIR), '[0-9]*.json' )
+        print(f'METADATA_TO_CSV: {len(meta)} metadata files found')
+        meta = meta[0:2]
+        print(meta)
+        
+        # import csv
+        # with open() as csvfile:
+        #     writer = csv.write(csvfile)
+
+        
     
     if archive: 
         all_targets = ['meta', 'sheets', 'images', 'movies', 'frames']
