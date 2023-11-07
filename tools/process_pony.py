@@ -636,19 +636,21 @@ if __name__ == '__main__':
     
     if metadata_to_csv:
         meta = list_files( os.path.join(extract_folder, TAR_META_DIR), '[0-9]*.json' )
-        print( os.path.join(extract_folder, TAR_META_DIR) )
+        print()
         print(f'METADATA_TO_CSV: {len(meta)} metadata files found')
         import csv
-        with open(os.path.join(extract_folder, TAR_META_DIR , '_metadata.csv'), 'w') as csvfile:
-            fieldnames = ['ID', 'Name', 'Description', 'Category No.', 'No.', 'Sample', 'Geolocation (Lat, Lon)', 'Timestamp', 'Temperature (°C)', 'Wind Direction (°)', 'Humus (Organic Matter)', 'Calcium (Ca)', 'Magnesium (Mg)', 'Potassium (K)', 'Phosphor (P)', 'Nitrogen (N)', 'Sulfate (SO4)', 'Iron (Fe)', 'eDNA_1_Kingdom', 'eDNA_2_Phylum', 'eDNA_3_Class', 'eDNA_4_Order', 'eDNA_5_Family', 'eDNA_6_Genus', 'eDNA_7_Species', 'Atmospheric Pressure (hPa)', 'Humidity (%)', 'Wind Speed (m/s)']
+        with open(os.path.join(extract_folder, 'metadata.csv'), 'w') as csvfile:
+            fieldnames = ['id', 'name', 'description', 'external_url', 'image', 'Category No.', 'No.', 'Sample', 'Geolocation (Lat, Lon)', 'Timestamp', 'Temperature (°C)', 'Wind Direction (°)', 'Humus (Organic Matter)', 'Calcium (Ca)', 'Magnesium (Mg)', 'Potassium (K)', 'Phosphor (P)', 'Nitrogen (N)', 'Sulfate (SO4)', 'Iron (Fe)', 'eDNA_1_Kingdom', 'eDNA_2_Phylum', 'eDNA_3_Class', 'eDNA_4_Order', 'eDNA_5_Family', 'eDNA_6_Genus', 'eDNA_7_Species', 'Atmospheric Pressure (hPa)', 'Humidity (%)', 'Wind Speed (m/s)']
             writer = csv.DictWriter(csvfile, fieldnames, extrasaction='ignore')
             writer.writeheader()
             for path in meta:
                 with open(path, 'r') as file:
                     obj = json.load(file)['_nft_metadata']
-                    obj['ID'] = obj['No.']
-                    obj['Name'] = f'PONY EARTH ReArt No. {obj['No.']}'
-                    obj['Description'] = f'PONY EARTH ReArt No. {obj['No.']}. The original PONY EARTH ReArt is based on biodiversity data captured on the first living lab and birthplace of PONY EARTH in Austria.'
+                    obj['id'] = obj['No.']
+                    obj['name'] = f'PONY EARTH ReArt No. {obj['No.']}'
+                    obj['description'] = f'PONY EARTH ReArt No. {obj['No.']}. The original PONY EARTH ReArt is based on biodiversity data captured on the first living lab and birthplace of PONY EARTH in Austria.'
+                    obj['external_url'] = ''
+                    obj['image'] = ''
                     obj['Category No.'] = obj['_category_no']
                     for key, val in obj['_edna_target'].items():
                         parts = key.split('_')
