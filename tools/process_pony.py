@@ -30,7 +30,7 @@
     --check_movies ... check movies for errors
     
     --archive ... compress stuff from extracted folder ('all', 'images', 'frames', 'movies', 'meta', 'sheets')
-    --001 ... use split utility to produce .zip.001, .zip.002, etc. instead of multipart .zip, .z01, .z02, etc.
+        --001 ... use split utility to produce .zip.001, .zip.002, etc. instead of multipart .zip, .z01, .z02, etc.
     
     Required utilities:
     * tar
